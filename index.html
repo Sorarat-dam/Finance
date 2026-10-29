@@ -1,0 +1,3677 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Verdant — บันทึกรายรับ-รายจ่าย & ไลฟ์สไตล์มินิมอล</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Plus Jakarta Sans & Noto Sans Thai -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <!-- ISO-Compliant QR Code Generator (Canvas High-Contrast for iOS/Android Camera) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', '"Noto Sans Thai"', 'sans-serif'],
+          },
+          colors: {
+            sage: {
+              50: '#F4F8F5',
+              100: '#E9F1EC',
+              200: '#D8E5DC',
+              300: '#BDD3C4',
+            },
+            forest: {
+              50: '#ECFDF5',
+              100: '#DCFCE7',
+              500: '#10B981',
+              600: '#16A34A',
+              700: '#15803D',
+              800: '#166534',
+              900: '#0F4C28',
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    * {
+      -webkit-tap-highlight-color: transparent;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Plus Jakarta Sans', 'Noto Sans Thai', sans-serif;
+      background-color: #E3EDE6;
+      color: #1A241E;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(21, 128, 61, 0.22);
+      border-radius: 9999px;
+    }
+    /* Deep Emerald / Forest Green Hero Card */
+    .hero-green-gradient {
+      background: linear-gradient(135deg, #166534 0%, #15803D 52%, #0D4424 100%);
+      box-shadow: 0 16px 34px -10px rgba(13, 68, 36, 0.40);
+    }
+    /* Translucent Frosted Sub-cards inside Hero Card */
+    .glass-subcard {
+      background: rgba(255, 255, 255, 0.14);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.24);
+    }
+    /* Minimal Soft Surface Card */
+    .soft-card {
+      background: #FFFFFF;
+      border: 1px solid #E1ECE4;
+      box-shadow: 0 4px 18px -4px rgba(18, 46, 28, 0.04);
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in {
+      animation: fadeIn 0.22s ease-out forwards;
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-slide-up {
+      animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex justify-center items-start md:py-5 md:px-4">
+
+  <!-- ========================================================= -->
+  <!-- MOBILE-FIRST APP CONTAINER                                -->
+  <!-- ========================================================= -->
+  <div id="app-shell" class="w-full max-w-[460px] min-h-screen md:min-h-[860px] md:max-h-[94vh] bg-[#F4F8F5] md:rounded-[36px] md:shadow-2xl md:border-[5px] md:border-white flex flex-col relative overflow-hidden">
+
+    <!-- ========================================================= -->
+    <!-- CLEAN REAL-TIME HEADER (NO FAKE STATUS BAR ICONS)         -->
+    <!-- ========================================================= -->
+    <header class="px-5 pt-3.5 pb-2.5 flex items-center justify-between bg-[#F4F8F5] border-b border-[#DCE7DF]/90 z-20 shrink-0 select-none">
+      <!-- Live Real-Time Digital Clock (HH:MM:SS) & Thai Date -->
+      <div class="flex items-center gap-2 min-w-0">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" title="เวลาปัจจุบันแบบเรียลไทม์"></span>
+        <span id="realtime-clock" class="text-[13px] font-extrabold tracking-tight text-stone-800 tabular-nums">--:--:--</span>
+        <span class="text-stone-300">·</span>
+        <span id="realtime-date" class="text-[11px] font-semibold text-stone-500 truncate">กำลังโหลดวันที่...</span>
+      </div>
+
+      <!-- Share App Button (Always Accessible) -->
+      <div class="flex items-center gap-1.5 shrink-0">
+        <button onclick="openShareModal('link')" title="แชร์แอปและสร้าง QR Code" class="px-2.5 py-1 rounded-full bg-[#DCFCE7] hover:bg-emerald-200/80 text-[#166534] text-[11px] font-bold flex items-center gap-1.5 transition active:scale-95">
+          <i class="fa-solid fa-qrcode text-[10px]"></i>
+          <span>แชร์แอป</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ========================================================= -->
+    <!-- AUTHENTICATION SCREEN (CLEAN BRAND-NEW REGISTER / LOGIN)  -->
+    <!-- ========================================================= -->
+    <div id="auth-view" class="flex-1 flex flex-col justify-between px-6 pt-5 pb-7 overflow-y-auto hidden">
+      <div>
+        <!-- Brand Identity -->
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-12 h-12 rounded-2xl hero-green-gradient flex items-center justify-center text-white shadow-md">
+            <i class="fa-solid fa-leaf text-lg"></i>
+          </div>
+          <div>
+            <h1 class="text-xl font-extrabold tracking-tight text-stone-900 leading-tight">Verdant Finance</h1>
+            <p class="text-xs text-stone-500 mt-0.5">บันทึกรายรับ-รายจ่าย · งบรายเดือน · ไลฟ์สไตล์</p>
+          </div>
+        </div>
+
+        <!-- Minimal Green Welcome Card -->
+        <div class="hero-green-gradient rounded-[26px] p-5 text-white mb-5 relative overflow-hidden">
+          <p class="text-[10px] uppercase tracking-widest text-emerald-100/85 font-semibold">Minimal Green Edition</p>
+          <h2 class="text-[17px] font-extrabold mt-1 leading-snug">จัดการรายรับ-รายจ่ายอย่างเรียบง่าย ข้อมูลเก็บปลอดภัยในเครื่องของคุณ</h2>
+          <div class="flex flex-wrap gap-1.5 mt-3.5 pt-3 border-t border-white/15 text-[10px] font-semibold text-emerald-50">
+            <span class="bg-white/15 px-2.5 py-1 rounded-full"><i class="fa-solid fa-wallet mr-1"></i>รับ-จ่าย &amp; งบเดือน</span>
+            <span class="bg-white/15 px-2.5 py-1 rounded-full"><i class="fa-regular fa-calendar mr-1"></i>ปฏิทินถึงปี 2032</span>
+            <span class="bg-white/15 px-2.5 py-1 rounded-full"><i class="fa-solid fa-database mr-1"></i>GreenFinanceDB</span>
+          </div>
+        </div>
+
+        <!-- Mode Tabs: Login vs Register -->
+        <div class="bg-[#E2ECE5] p-1 rounded-2xl flex mb-4">
+          <button id="tab-login-btn" type="button" onclick="switchAuthMode('login')" class="flex-1 py-2.5 text-xs font-bold rounded-xl bg-white text-[#166534] shadow-xs transition-all">
+            เข้าสู่ระบบ (Login)
+          </button>
+          <button id="tab-register-btn" type="button" onclick="switchAuthMode('register')" class="flex-1 py-2.5 text-xs font-bold rounded-xl text-stone-600 hover:text-stone-900 transition-all">
+            สมัครสมาชิกใหม่ (Register)
+          </button>
+        </div>
+
+        <!-- Feedback Banner -->
+        <div id="auth-message" class="hidden mb-4 px-4 py-3 rounded-2xl text-xs font-bold border"></div>
+
+        <!-- First-Time Clean State Onboarding Notice -->
+        <div id="first-time-hint" class="hidden mb-4 p-3.5 rounded-2xl bg-[#ECFDF5] border border-emerald-200 flex items-center justify-between gap-2">
+          <div class="text-xs text-[#166534]">
+            <span class="font-extrabold block">เริ่มต้นใช้งานครั้งแรก</span>
+            <span class="text-[11px] text-emerald-700/85">ยังไม่มีบัญชีในเครื่องนี้ กดสมัครสมาชิกเพื่อสร้างกระเป๋าของคุณ</span>
+          </div>
+          <button type="button" onclick="switchAuthMode('register')" class="px-3 py-1.5 rounded-xl bg-[#15803D] text-white text-[11px] font-bold shrink-0">
+            สมัครใหม่
+          </button>
+        </div>
+
+        <!-- Saved Accounts Quick Picker (Only shown if user registered accounts on this device) -->
+        <div id="saved-accounts-bar" class="hidden mb-4">
+          <span class="block text-[10px] font-bold uppercase tracking-wider text-stone-400 mb-1.5">บัญชีที่บันทึกในเครื่องนี้ (แตะเพื่อเลือกชื่อผู้ใช้)</span>
+          <div id="saved-accounts-chips" class="flex flex-wrap gap-1.5"></div>
+        </div>
+
+        <!-- LOGIN FORM -->
+        <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4 animate-fade-in">
+          <div class="soft-card rounded-3xl p-5 space-y-4">
+            <div>
+              <label class="block text-[11px] font-bold uppercase tracking-wider text-stone-400 mb-1.5">ชื่อผู้ใช้งาน (Username)</label>
+              <div class="relative">
+                <i class="fa-regular fa-user absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-xs"></i>
+                <input id="login-username" type="text" required autocomplete="username" placeholder="กรอก Username ของคุณ"
+                  class="w-full pl-9 pr-4 py-3 rounded-2xl bg-[#F4F8F5] border border-[#D8E5DC] text-sm font-semibold text-stone-800 focus:outline-none focus:border-[#15803D] transition" />
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-bold uppercase tracking-wider text-stone-400 mb-1.5">รหัสผ่าน / PIN (Password)</label>
+              <div class="relative">
+                <i class="fa-solid fa-lock absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-xs"></i>
+                <input id="login-password" type="password" required autocomplete="current-password" placeholder="กรอกรหัสผ่าน หรือ PIN"
+                  class="w-full pl-9 pr-10 py-3 rounded-2xl bg-[#F4F8F5] border border-[#D8E5DC] text-sm font-semibold text-stone-800 focus:outline-none focus:border-[#15803D] transition" />
+                <button type="button" onclick="togglePasswordVisibility('login-password', this)" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 text-xs">
+                  <i class="fa-regular fa-eye"></i>
+                </button>
+              </div>
+            </div>
+
+            <button type="submit" class="w-full py-3.5 rounded-2xl bg-[#15803D] hover:bg-[#166534] active:scale-[0.99] text-white font-bold text-sm shadow-md shadow-emerald-900/15 transition flex items-center justify-center gap-2">
+              <span>เข้าสู่ระบบ</span>
+              <i class="fa-solid fa-arrow-right text-xs"></i>
+            </button>
+          </div>
+
+          <!-- Restore Backup Option on Auth Screen -->
+          <div class="text-center pt-1">
+            <label class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#15803D] hover:underline cursor-pointer">
+              <i class="fa-solid fa-file-import text-[11px]"></i>
+              <span>นำเข้าไฟล์สำรองข้อมูลบัญชี (.JSON) จากเครื่อง</span>
+              <input type="file" accept=".json,application/json" onchange="handleImportFullBackupOnAuth(event)" class="hidden" />
+            </label>
+          </div>
+        </form>
+
+        <!-- REGISTER FORM (Supports Solo Mode OR Shared Partner Mode) -->
+        <form id="register-form" onsubmit="handleRegister(event)" class="space-y-4 hidden animate-fade-in">
+          <div class="soft-card rounded-3xl p-5 space-y-3.5">
+            <div class="grid grid-cols-2 gap-2.5">
+              <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-stone-400 mb-1">ชื่อของคุณ *</label>
+                <input id="reg-displayname" type="text" required placeholder="ชื่อที่แสดงในแอป"
+                  class="w-full px-3.5 py-2.5 rounded-2xl bg-[#F4F8F5] border border-[#D8E5DC] text-sm font-semibold text-stone-800 focus:outline-none focus:border-[#15803D]" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-stone-400 mb-1">Username *</label>
+                <input id="reg-username" type="text" required autocomplete="username" placeholder="ไอดีสำหรับ Login"
+                  class="w-full px-3.5 py-2.5 rounded-2xl bg-[#F4F8F5] border border-[#D8E5DC] text-sm font-semibold text-stone-800 focus:outline-none focus:border-[#15803D]" />
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-bold uppercase tracking-wider text-stone-400 mb-1">รหัสผ่าน หรือ PIN (อย่างน้อย 4 ตัว) *</label>
+              <div class="relative">
+                <input id="reg-password" type="password" required minlength="4" autocomplete="new-password" placeholder="ตั้งรหัสผ่าน หรือรหัส PIN"
+                  class="w-full pl-3.5 pr-10 py-2.5 rounded-2xl bg-[#F4F8F5] border border-[#D8E5DC] text-sm font-semibold text-stone-800 focus:outline-none focus:border-[#15803D]" />
+                <button type="button" onclick="togglePasswordVisibility('reg-password', this)" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 text-xs">
+                  <i class="fa-regular fa-eye"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Wallet Mode Selector: Solo vs Shared -->
+            <div>
+              <label class="block text-[11px] font-bold uppercase tracking-wider text-stone-400 mb-1.5">รูปแบบกระเป๋าเงิน</label>
+              <div class="grid grid-cols-2 gap-2">
+                <button type="button" id="reg-mode-solo" onclick="setRegisterWalletMode('solo')" class="py-2.5 px-3 rounded-2xl text-xs font-bold border bg-[#ECFDF5] border-[#15803D] text-[#166534] flex items-center justify-center gap-1.5 transition">
+                  <i class="fa-solid fa-user text-[11px]"></i>
+                  <span>ใช้งานคนเดียว</span>
+                </button>
+                <button type="button" id="reg-mode-shared" onclick="setRegisterWalletMode('shared')" class="py-2.5 px-3 rounded-2xl text-xs font-bold border bg-[#F4F8F5] border-[#D8E5DC] text-stone-600 flex items-center justify-center gap-1.5 transition">
+                  <i class="fa-solid fa-user-group text-[11px]"></i>
+                  <span>กระเป๋าร่วมกับคู่หู</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Partner Name Input (Shown when Shared Mode is chosen) -->
+            <div id="reg-partner-box" class="hidden">
+              <label class="block text-[11px] font-bold uppercase tracking-wider text-stone-400 mb-1">ชื่อคู่หู / คนหารค่าใช้จ่ายร่วมกัน *</label>
+              <input id="reg-partner" type="text" placeholder="ระบุชื่อแฟน เพื่อน หรือคนในครอบครัว"
+                class="w-full px-3.5 py-2.5 rounded-2xl bg-[#F4F8F5] border border-[#D8E5DC] text-sm font-semibold text-stone-800 focus:outline-none focus:border-[#15803D]" />
+            </div>
+
+            <!-- Avatar Color Selector -->
+            <div>
+              <label class="block text-[11px] font-bold uppercase tracking-wider text-stone-400 mb-1.5">สีไอคอนประจำตัว</label>
+              <div class="flex items-center gap-3" id="reg-color-picker">
+                <button type="button" onclick="selectRegColor('#15803D')" data-color="#15803D" class="w-7 h-7 rounded-full bg-[#15803D] ring-2 ring-offset-2 ring-[#15803D]"></button>
+                <button type="button" onclick="selectRegColor('#0D9488')" data-color="#0D9488" class="w-7 h-7 rounded-full bg-[#0D9488] opacity-60"></button>
+                <button type="button" onclick="selectRegColor('#059669')" data-color="#059669" class="w-7 h-7 rounded-full bg-[#059669] opacity-60"></button>
+                <button type="button" onclick="selectRegColor('#4D7C0F')" data-color="#4D7C0F" class="w-7 h-7 rounded-full bg-[#4D7C0F] opacity-60"></button>
+                <button type="button" onclick="selectRegColor('#334155')" data-color="#334155" class="w-7 h-7 rounded-full bg-[#334155] opacity-60"></button>
+              </div>
+            </div>
+
+            <button type="submit" class="w-full py-3.5 mt-1 rounded-2xl bg-[#15803D] hover:bg-[#166534] text-white font-bold text-sm shadow-md shadow-emerald-900/15 transition">
+              สร้างบัญชีใหม่และเริ่มใช้งาน
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div class="text-[11px] text-center text-stone-400 mt-5 flex items-center justify-center gap-1.5">
+        <i class="fa-solid fa-shield-halved text-emerald-600"></i>
+        <span>ฐานข้อมูลจัดเก็บในเครื่องโดยตรง (IndexedDB: GreenFinanceDB)</span>
+      </div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- MAIN LOGGED-IN APPLICATION VIEW                           -->
+    <!-- ========================================================= -->
+    <div id="main-app-view" class="flex-1 flex flex-col overflow-hidden hidden">
+
+      <!-- Active User Bar + Quick Record & Logout -->
+      <div class="px-5 py-2 flex items-center justify-between bg-white/85 border-b border-[#E1ECE4] shrink-0">
+        <div class="flex items-center gap-2 min-w-0">
+          <button id="payer-switch-btn" onclick="toggleActivePayer()" title="คลิกเพื่อสลับผู้จ่ายรายการ" class="flex items-center gap-2 bg-[#F4F8F5] px-2.5 py-1 rounded-full border border-[#D8E5DC] hover:border-[#15803D]/50 transition">
+            <span id="header-user-badge" class="w-5 h-5 rounded-full bg-[#15803D] text-white text-[10px] font-bold flex items-center justify-center shrink-0">U</span>
+            <span id="header-user-name" class="text-xs font-bold text-stone-800 truncate max-w-[95px]">User</span>
+            <i id="header-switch-icon" class="fa-solid fa-repeat text-[9px] text-stone-400 hidden"></i>
+          </button>
+          <span id="header-partner-wrap" class="text-[11px] text-stone-400 font-medium truncate hidden">
+            ร่วมกับ <span id="header-partner-name" class="font-semibold text-stone-600"></span>
+          </span>
+        </div>
+
+        <div class="flex items-center gap-1.5 shrink-0">
+          <button onclick="openTransactionModal('expense')" class="px-3 py-1.5 rounded-full bg-[#15803D] hover:bg-[#166534] text-white text-[11px] font-bold flex items-center gap-1 shadow-2xs transition">
+            <i class="fa-solid fa-plus text-[9px]"></i>
+            <span>บันทึกรายการ</span>
+          </button>
+          <button onclick="handleLogout()" title="สลับบัญชี / ออกจากระบบ (Logout)" class="w-7 h-7 rounded-full bg-[#E9F1EC] hover:bg-red-50 text-stone-600 hover:text-red-600 flex items-center justify-center transition">
+            <i class="fa-solid fa-right-from-bracket text-xs"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- SCROLLABLE VIEWPORT -->
+      <div id="tab-content-scroll" class="flex-1 overflow-y-auto pb-28">
+
+        <!-- ===================================================== -->
+        <!-- TAB 1: HOME OVERVIEW                                  -->
+        <!-- ===================================================== -->
+        <section id="view-home" class="px-5 pt-4 space-y-5 hidden animate-fade-in">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs font-semibold text-stone-400" id="home-live-greeting">สวัสดี,</p>
+              <h1 class="text-2xl font-extrabold text-stone-900 tracking-tight" id="home-greeting-title">ผู้ใช้งาน</h1>
+            </div>
+            <button onclick="switchTab('finance')" class="px-3.5 py-2 rounded-2xl bg-[#DCFCE7] text-[#166534] text-xs font-bold flex items-center gap-1.5 hover:bg-emerald-200/70 transition">
+              <i class="fa-solid fa-wallet"></i>
+              <span>ดูการเงิน</span>
+            </button>
+          </div>
+
+          <!-- Monthly Summary Card -->
+          <div class="hero-green-gradient rounded-[28px] p-5 text-white">
+            <div class="flex items-center justify-between mb-1">
+              <span id="home-month-label" class="text-[11px] font-semibold tracking-wider uppercase text-emerald-100/90">ภาพรวมเดือนนี้</span>
+              <span id="home-mode-badge" class="text-[10px] bg-white/15 px-2.5 py-0.5 rounded-full font-semibold">ใช้งานคนเดียว</span>
+            </div>
+            <div class="grid grid-cols-3 gap-2 my-3 pt-2.5 border-t border-white/15">
+              <div>
+                <p class="text-[10px] text-emerald-100/75">รายรับเดือนนี้</p>
+                <p id="home-total-income" class="text-base font-extrabold text-emerald-200 mt-0.5 tabular-nums">+฿ 0</p>
+              </div>
+              <div>
+                <p class="text-[10px] text-emerald-100/75">รายจ่ายเดือนนี้</p>
+                <p id="home-total-expense" class="text-base font-extrabold text-white mt-0.5 tabular-nums">฿ 0</p>
+              </div>
+              <div>
+                <p class="text-[10px] text-emerald-100/75">คงเหลือสุทธิ</p>
+                <p id="home-net-balance" class="text-base font-extrabold text-lime-200 mt-0.5 tabular-nums">฿ 0</p>
+              </div>
+            </div>
+            <div class="flex gap-2 mt-3">
+              <button onclick="openTransactionModal('expense')" class="flex-1 py-2.5 rounded-xl bg-white text-[#166534] font-bold text-xs shadow-2xs flex items-center justify-center gap-1.5 hover:bg-emerald-50 transition">
+                <i class="fa-solid fa-circle-minus"></i> จดรายจ่าย
+              </button>
+              <button onclick="openTransactionModal('income')" class="flex-1 py-2.5 rounded-xl bg-white/20 hover:bg-white/30 text-white font-bold text-xs border border-white/25 flex items-center justify-center gap-1.5 transition">
+                <i class="fa-solid fa-circle-plus"></i> จดรายรับ
+              </button>
+            </div>
+          </div>
+
+          <!-- Quick Lifestyle Cards -->
+          <div class="grid grid-cols-2 gap-3.5">
+            <div onclick="switchTab('shopping')" class="soft-card rounded-3xl p-4 cursor-pointer hover:border-[#15803D]/40 transition">
+              <div class="flex items-center justify-between mb-2">
+                <div class="w-9 h-9 rounded-2xl bg-[#DCFCE7] text-[#166534] flex items-center justify-center">
+                  <i class="fa-solid fa-cart-shopping"></i>
+                </div>
+                <span id="home-shopping-count" class="text-xs font-extrabold px-2 py-0.5 rounded-full bg-[#15803D] text-white">0</span>
+              </div>
+              <h3 class="text-sm font-bold text-stone-800">รายการซื้อของ</h3>
+              <p class="text-[11px] text-stone-400 mt-0.5">ของที่ต้องซื้อเข้าบ้าน</p>
+            </div>
+
+            <div onclick="switchTab('calendar'); switchCalendarSubTab('mood');" class="soft-card rounded-3xl p-4 cursor-pointer hover:border-[#15803D]/40 transition">
+              <div class="flex items-center justify-between mb-2">
+                <div id="home-mood-icon-wrap" class="w-9 h-9 rounded-2xl bg-[#ECFDF5] text-[#15803D] flex items-center justify-center">
+                  <i class="fa-regular fa-face-smile"></i>
+                </div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#E9F1EC] text-stone-600">วันนี้</span>
+              </div>
+              <h3 class="text-sm font-bold text-stone-800">อารมณ์ &amp; ปฏิทิน</h3>
+              <p id="home-mood-status" class="text-[11px] text-stone-400 mt-0.5 truncate">แตะเพื่อบันทึกอารมณ์วันนี้</p>
+            </div>
+          </div>
+
+          <!-- Recent Transactions -->
+          <div>
+            <div class="flex items-center justify-between mb-2.5 px-1">
+              <span class="text-xs font-bold uppercase tracking-wider text-stone-400">รายการล่าสุด</span>
+              <button onclick="switchTab('finance')" class="text-xs font-bold text-[#15803D]">ดูทั้งหมด →</button>
+            </div>
+            <div id="home-recent-tx" class="soft-card rounded-3xl divide-y divide-[#E9F1EC] px-4 py-1"></div>
+          </div>
+        </section>
+
+        <!-- ===================================================== -->
+        <!-- TAB 2: SHOPPING LIST (THAI CATEGORIES)                -->
+        <!-- ===================================================== -->
+        <section id="view-shopping" class="px-5 pt-4 space-y-5 hidden animate-fade-in">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="flex items-center gap-2.5">
+                <i class="fa-solid fa-cart-shopping text-[#15803D] text-xl"></i>
+                <h1 class="text-[23px] font-extrabold text-stone-900 tracking-tight">Shopping List</h1>
+              </div>
+              <p class="text-xs text-stone-500 mt-0.5">รายการของต้องซื้อ · <span id="shopping-subtitle-names">บัญชีของคุณ</span></p>
+            </div>
+            <button onclick="clearCompletedShopping()" id="btn-clear-done-shop" class="hidden text-[11px] font-bold text-stone-500 hover:text-red-600 bg-white px-3 py-1.5 rounded-full border border-[#D8E5DC] transition">
+              ลบที่ติ๊กแล้ว
+            </button>
+          </div>
+
+          <!-- Thai Category Filter Pills -->
+          <div class="flex flex-wrap gap-2" id="shopping-filter-pills"></div>
+
+          <!-- Shopping Items Card -->
+          <div class="soft-card rounded-[28px] px-5 py-3 divide-y divide-[#E9F1EC]">
+            <div id="shopping-list-items" class="divide-y divide-[#E9F1EC]"></div>
+
+            <!-- Add Item Row -->
+            <form onsubmit="handleAddShoppingItem(event)" class="pt-3.5 pb-1.5 flex items-center gap-2">
+              <button type="submit" class="w-8 h-8 rounded-full bg-[#DCFCE7] text-[#166534] flex items-center justify-center text-sm hover:bg-emerald-200 transition shrink-0">
+                <i class="fa-solid fa-plus text-xs"></i>
+              </button>
+              <input id="shopping-new-input" type="text" placeholder="เพิ่มรายการของต้องซื้อ..." required
+                class="flex-1 text-sm bg-transparent text-stone-800 placeholder-stone-400 focus:outline-none min-w-0" />
+              <select id="shopping-new-cat" class="text-xs font-bold bg-[#F4F8F5] border border-[#D8E5DC] text-stone-700 rounded-xl px-2.5 py-1.5 focus:outline-none shrink-0">
+                <option value="ของใช้ในบ้าน">ของใช้ในบ้าน</option>
+                <option value="อาหาร">อาหาร</option>
+                <option value="สุขภาพ">สุขภาพ</option>
+                <option value="สัตว์เลี้ยง">สัตว์เลี้ยง</option>
+              </select>
+            </form>
+          </div>
+        </section>
+
+        <!-- ===================================================== -->
+        <!-- TAB 3: CALENDAR & MOOD TRACKER (2024 - 2032 / 2030+)  -->
+        <!-- ===================================================== -->
+        <section id="view-calendar" class="px-5 pt-4 space-y-4 hidden animate-fade-in">
+          <!-- Calendar Header + Shared / Personal Switchable Badges -->
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-xl bg-[#15803D] text-white flex items-center justify-center">
+                <i class="fa-regular fa-calendar-days text-sm"></i>
+              </div>
+              <h1 class="text-[23px] font-extrabold text-stone-900 tracking-tight">ปฏิทิน</h1>
+            </div>
+
+            <div class="flex items-center gap-1.5">
+              <button id="cal-scope-shared" onclick="setCalendarScope('Shared')" class="px-3 py-1 rounded-full text-[11px] font-bold bg-[#DCFCE7] text-[#166534] border border-emerald-300 flex items-center gap-1.5 transition">
+                <span class="w-1.5 h-1.5 rounded-full bg-[#15803D]"></span>Shared
+              </button>
+              <button id="cal-scope-personal" onclick="setCalendarScope('Personal')" class="px-3 py-1 rounded-full text-[11px] font-bold bg-white text-stone-600 border border-[#D8E5DC] flex items-center gap-1.5 transition">
+                <span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span>Personal
+              </button>
+            </div>
+          </div>
+
+          <!-- Sub-tabs: เดือน (Month) | รายการ (List) | อารมณ์ (Mood) -->
+          <div class="flex justify-center">
+            <div class="bg-[#E3EDE6] p-1 rounded-full inline-flex items-center gap-1">
+              <button id="cal-tab-month" onclick="switchCalendarSubTab('month')" class="px-3.5 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 bg-white text-[#166534] shadow-2xs transition">
+                <i class="fa-solid fa-border-all text-[11px]"></i> เดือน (Month)
+              </button>
+              <button id="cal-tab-list" onclick="switchCalendarSubTab('list')" class="px-3.5 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 text-stone-600 hover:text-stone-900 transition">
+                <i class="fa-solid fa-list-ul text-[11px]"></i> รายการ (List)
+              </button>
+              <button id="cal-tab-mood" onclick="switchCalendarSubTab('mood')" class="px-3.5 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 text-stone-600 hover:text-stone-900 transition">
+                <i class="fa-regular fa-face-smile text-[11px]"></i> อารมณ์ (Mood)
+              </button>
+            </div>
+          </div>
+
+          <!-- Month & Year Selector Bar (2024 to 2032) + วันนี้ Shortcut -->
+          <div class="soft-card rounded-2xl p-2.5 flex items-center justify-between gap-1.5">
+            <button onclick="changeCalendarMonth(-1)" title="เดือนก่อนหน้า" class="w-8 h-8 rounded-xl bg-[#F4F8F5] hover:bg-[#DCFCE7] text-stone-700 hover:text-[#166534] flex items-center justify-center text-xs transition shrink-0">
+              <i class="fa-solid fa-chevron-left"></i>
+            </button>
+
+            <div class="flex items-center gap-1.5 flex-1 justify-center">
+              <select id="cal-month-select" onchange="handleCalMonthYearSelect()" class="bg-[#F4F8F5] border border-[#D8E5DC] text-stone-800 text-xs font-extrabold rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-[#15803D]"></select>
+              <select id="cal-year-select" onchange="handleCalMonthYearSelect()" class="bg-[#F4F8F5] border border-[#D8E5DC] text-stone-800 text-xs font-extrabold rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-[#15803D]"></select>
+              <button onclick="jumpCalendarToToday()" class="px-2.5 py-1.5 rounded-xl bg-[#DCFCE7] text-[#166534] text-[11px] font-bold hover:bg-emerald-200/70 transition shrink-0">
+                วันนี้
+              </button>
+            </div>
+
+            <button onclick="changeCalendarMonth(1)" title="เดือนถัดไป" class="w-8 h-8 rounded-xl bg-[#F4F8F5] hover:bg-[#DCFCE7] text-stone-700 hover:text-[#166534] flex items-center justify-center text-xs transition shrink-0">
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
+          </div>
+
+          <!-- SUB-VIEW 1: MONTH VIEW -->
+          <div id="cal-subview-month" class="space-y-4">
+            <div class="soft-card rounded-[28px] p-4">
+              <div class="grid grid-cols-7 text-center text-[11px] font-bold text-stone-400 uppercase mb-2.5">
+                <div class="text-rose-400">อา</div><div>จ</div><div>อ</div><div>พ</div><div>พฤ</div><div>ศ</div><div class="text-emerald-600">ส</div>
+              </div>
+              <div id="calendar-month-grid" class="grid grid-cols-7 gap-1 text-center text-sm font-bold"></div>
+            </div>
+
+            <div class="flex items-center justify-between px-1">
+              <div class="flex items-center gap-2 text-[#166534] font-bold text-sm">
+                <i class="fa-regular fa-calendar-check"></i>
+                <span id="cal-selected-date-label">-</span>
+              </div>
+              <button onclick="openAddEventModal()" class="w-8 h-8 rounded-full bg-[#15803D] hover:bg-[#166534] text-white flex items-center justify-center shadow-xs transition">
+                <i class="fa-solid fa-plus text-xs"></i>
+              </button>
+            </div>
+
+            <div id="cal-day-events-box" class="soft-card rounded-[26px] p-5 text-center"></div>
+          </div>
+
+          <!-- SUB-VIEW 2: MOOD VIEW (GEOMETRIC CUTE FACES) -->
+          <div id="cal-subview-mood" class="hidden space-y-4">
+            <div class="soft-card rounded-[28px] p-5 space-y-5">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <i class="fa-regular fa-face-smile text-[#15803D] text-base"></i>
+                  <h3 class="text-sm font-extrabold text-stone-900">วันนี้คุณรู้สึกอย่างไร?</h3>
+                </div>
+                <span id="mood-selected-date-text" class="text-xs font-bold text-[#166534] bg-[#DCFCE7] px-2.5 py-0.5 rounded-full">-</span>
+              </div>
+
+              <!-- 5 Cute Geometric Face Icons -->
+              <div class="grid grid-cols-5 gap-2 text-center" id="mood-selector-row"></div>
+
+              <!-- Selected Day Mood Status -->
+              <div id="mood-banner-card" class="bg-[#F4F8F5] border border-[#E1ECE4] rounded-2xl p-3.5 flex items-center justify-between gap-3"></div>
+
+              <hr class="border-[#E9F1EC]" />
+
+              <!-- Monthly Mood Grid -->
+              <div>
+                <div class="flex items-center justify-between mb-2.5">
+                  <span class="text-xs font-bold uppercase tracking-wider text-stone-400">ตารางอารมณ์ประจำเดือน</span>
+                  <span class="text-[11px] text-stone-400">แตะวันที่เพื่อเลือกบันทึก</span>
+                </div>
+                <div class="grid grid-cols-7 text-center text-[11px] font-bold text-stone-400 mb-2">
+                  <div>อา</div><div>จ</div><div>อ</div><div>พ</div><div>พฤ</div><div>ศ</div><div>ส</div>
+                </div>
+                <div id="mood-calendar-grid" class="grid grid-cols-7 gap-1.5"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUB-VIEW 3: LIST VIEW -->
+          <div id="cal-subview-list" class="hidden space-y-3">
+            <div class="flex justify-end">
+              <button onclick="openAddEventModal()" class="px-3.5 py-1.5 rounded-full bg-[#15803D] text-white text-xs font-bold flex items-center gap-1.5">
+                <i class="fa-solid fa-plus text-[10px]"></i> เพิ่มกิจกรรม
+              </button>
+            </div>
+            <div id="cal-all-events-list" class="soft-card rounded-[28px] p-4 divide-y divide-[#E9F1EC]"></div>
+          </div>
+        </section>
+
+        <!-- ===================================================== -->
+        <!-- TAB 4: MY PETS (SEARCH + PHOTO / EMOJI IN INDEXEDDB)  -->
+        <!-- ===================================================== -->
+        <section id="view-pet" class="px-5 pt-4 space-y-4 hidden animate-fade-in">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="flex items-center gap-2">
+                <i class="fa-solid fa-paw text-[#15803D] text-xl"></i>
+                <h1 class="text-[23px] font-extrabold text-stone-900 tracking-tight">My Pets</h1>
+              </div>
+              <p class="text-xs text-stone-500 mt-0.5">สัตว์เลี้ยงในความดูแล (<span id="pet-count-label">0</span> ตัว)</p>
+            </div>
+            <button onclick="openAddPetModal()" class="w-10 h-10 rounded-full bg-[#15803D] hover:bg-[#166534] text-white flex items-center justify-center shadow-sm transition active:scale-95">
+              <i class="fa-solid fa-plus text-sm"></i>
+            </button>
+          </div>
+
+          <!-- Search Bar -->
+          <div class="relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 text-xs"></i>
+            <input id="pet-search-input" oninput="renderPets()" type="text" placeholder="ค้นหาชื่อสัตว์เลี้ยง หรือสายพันธุ์..."
+              class="w-full pl-10 pr-4 py-2.5 rounded-full bg-white border border-[#D8E5DC] text-sm text-stone-800 placeholder-stone-400 focus:outline-none focus:border-[#15803D]" />
+          </div>
+
+          <div id="pet-cards-container" class="space-y-3.5 pb-4"></div>
+        </section>
+
+        <!-- ===================================================== -->
+        <!-- TAB 5: FINANCE (รายรับ-รายจ่าย & งบประมาณรายเดือน)     -->
+        <!-- ===================================================== -->
+        <section id="view-finance" class="px-5 pt-3.5 space-y-5 animate-fade-in">
+
+          <!-- Header Row -->
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <div class="flex items-center gap-2">
+                <div class="w-7 h-7 rounded-lg bg-[#15803D] text-white flex items-center justify-center shadow-2xs">
+                  <i class="fa-solid fa-wallet text-xs"></i>
+                </div>
+                <h1 class="text-[24px] font-extrabold text-stone-900 tracking-tight leading-none">Finance</h1>
+              </div>
+              <p id="finance-subtitle" class="text-xs text-stone-500 mt-1.5 font-medium">รายรับ - รายจ่ายประจำเดือน</p>
+            </div>
+
+            <button onclick="openTransactionModal('expense')" class="px-3.5 py-2 rounded-2xl bg-[#15803D] hover:bg-[#166534] text-white text-xs font-bold shadow-md shadow-emerald-900/15 flex items-center gap-1.5 transition active:scale-95">
+              <i class="fa-solid fa-plus"></i>
+              <span>บันทึกรายการ</span>
+            </button>
+          </div>
+
+          <!-- Month/Year Selector Bar (2024 to 2032) -->
+          <div class="soft-card rounded-2xl p-2 flex items-center justify-between gap-1.5">
+            <button onclick="changeFinanceMonth(-1)" class="w-8 h-8 rounded-xl bg-[#F4F8F5] hover:bg-[#DCFCE7] text-stone-700 flex items-center justify-center text-xs transition shrink-0">
+              <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <div class="flex items-center gap-1.5 justify-center flex-1">
+              <select id="fin-month-select" onchange="handleFinanceMonthSelect()" class="bg-[#F4F8F5] border border-[#D8E5DC] text-stone-800 text-xs font-extrabold rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-[#15803D]"></select>
+              <select id="fin-year-select" onchange="handleFinanceMonthSelect()" class="bg-[#F4F8F5] border border-[#D8E5DC] text-stone-800 text-xs font-extrabold rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-[#15803D]"></select>
+              <button onclick="jumpFinanceToCurrentMonth()" class="px-2.5 py-1.5 rounded-xl bg-[#DCFCE7] text-[#166534] text-[11px] font-bold hover:bg-emerald-200/70 transition shrink-0">
+                เดือนนี้
+              </button>
+            </div>
+            <button onclick="changeFinanceMonth(1)" class="w-8 h-8 rounded-xl bg-[#F4F8F5] hover:bg-[#DCFCE7] text-stone-700 flex items-center justify-center text-xs transition shrink-0">
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
+          </div>
+
+          <!-- DEEP EMERALD / FOREST GREEN HERO CARD -->
+          <div class="hero-green-gradient rounded-[28px] p-5 text-white space-y-4">
+            <!-- Metric Mode Switcher -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <span id="hero-metric-label" class="text-[11px] font-semibold uppercase tracking-widest text-emerald-100/90">
+                รายจ่ายเดือนนี้
+              </span>
+              <div class="bg-black/20 p-0.5 rounded-full inline-flex self-start sm:self-auto text-[10px] font-bold">
+                <button onclick="setHeroMetricMode('expense')" id="hero-mode-expense" class="px-2.5 py-1 rounded-full bg-white text-[#166534] transition">รายจ่ายเดือนนี้</button>
+                <button onclick="setHeroMetricMode('income')" id="hero-mode-income" class="px-2.5 py-1 rounded-full text-white/80 hover:text-white transition">รายรับเดือนนี้</button>
+                <button onclick="setHeroMetricMode('net')" id="hero-mode-net" class="px-2.5 py-1 rounded-full text-white/80 hover:text-white transition">คงเหลือสุทธิ</button>
+              </div>
+            </div>
+
+            <!-- Main Big Amount -->
+            <div class="flex items-baseline justify-between flex-wrap gap-2">
+              <div id="hero-main-amount" class="text-[36px] font-extrabold tracking-tight leading-none tabular-nums">
+                ฿ 0
+              </div>
+              <div id="hero-secondary-badge" class="text-[11px] font-semibold bg-white/15 px-2.5 py-1 rounded-full text-emerald-100 tabular-nums">
+                รายรับ +฿ 0
+              </div>
+            </div>
+
+            <!-- Split Paid Progress Bars -->
+            <div id="hero-breakdown-bars" class="grid grid-cols-2 gap-5 pt-1"></div>
+
+            <!-- Translucent Pending Settlement Cards -->
+            <div id="hero-glass-cards" class="grid grid-cols-2 gap-3 pt-1"></div>
+          </div>
+
+          <!-- MONTHLY BUDGET SECTION -->
+          <div class="space-y-3">
+            <div class="flex items-center justify-between px-1">
+              <span class="text-xs font-bold uppercase tracking-wider text-stone-500">งบประมาณรายเดือน (MONTHLY BUDGET)</span>
+              <button onclick="openBudgetModal()" class="text-xs font-bold text-[#15803D] hover:underline flex items-center gap-1">
+                <i class="fa-solid fa-plus text-[10px]"></i>
+                <span>เพิ่มหมวดหมู่</span>
+              </button>
+            </div>
+            <div id="budget-list-card" class="soft-card rounded-[28px] p-5 space-y-4"></div>
+          </div>
+
+          <!-- TRANSACTIONS LIST SECTION -->
+          <div class="space-y-3">
+            <div class="flex items-center justify-between px-1">
+              <span class="text-xs font-bold uppercase tracking-wider text-stone-500">รายการรับ - จ่าย (TRANSACTIONS)</span>
+              <button onclick="openTransactionModal('expense')" class="text-xs font-bold text-[#15803D] hover:underline flex items-center gap-1">
+                <i class="fa-solid fa-plus text-[10px]"></i>
+                <span>บันทึกรายการ</span>
+              </button>
+            </div>
+
+            <!-- Filter Pills -->
+            <div class="flex items-center gap-1.5 overflow-x-auto pb-1">
+              <button onclick="filterTransactions('all')" id="tx-filter-all" class="px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#15803D] text-white shrink-0 transition">
+                ทั้งหมด
+              </button>
+              <button onclick="filterTransactions('expense')" id="tx-filter-expense" class="px-3.5 py-1.5 rounded-full text-xs font-bold bg-white text-stone-600 border border-[#D8E5DC] shrink-0 transition">
+                รายจ่าย
+              </button>
+              <button onclick="filterTransactions('income')" id="tx-filter-income" class="px-3.5 py-1.5 rounded-full text-xs font-bold bg-white text-stone-600 border border-[#D8E5DC] shrink-0 transition">
+                รายรับ
+              </button>
+              <button onclick="filterTransactions('pending')" id="tx-filter-pending" class="px-3.5 py-1.5 rounded-full text-xs font-bold bg-white text-stone-600 border border-[#D8E5DC] shrink-0 transition">
+                รอเคลียร์ยอด
+              </button>
+            </div>
+
+            <div id="transactions-list-container" class="soft-card rounded-[28px] px-4 py-2 divide-y divide-[#E9F1EC]"></div>
+          </div>
+        </section>
+
+        <!-- ===================================================== -->
+        <!-- TAB 6: PROFILE, SHARE QR & LOCAL DB BACKUP/RESTORE    -->
+        <!-- ===================================================== -->
+        <section id="view-profile" class="px-5 pt-4 space-y-5 hidden animate-fade-in">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-xl bg-[#15803D] text-white flex items-center justify-center">
+                <i class="fa-solid fa-user text-sm"></i>
+              </div>
+              <h1 class="text-[23px] font-extrabold text-stone-900 tracking-tight">โปรไฟล์ &amp; ข้อมูล</h1>
+            </div>
+            <span class="text-[11px] font-bold px-3 py-1 rounded-full bg-[#DCFCE7] text-[#166534] border border-emerald-200">
+              <i class="fa-solid fa-database mr-1"></i>GreenFinanceDB
+            </span>
+          </div>
+
+          <!-- User Profile Card -->
+          <div class="soft-card rounded-[28px] p-5 space-y-4">
+            <div class="flex items-center justify-between gap-3">
+              <div class="flex items-center gap-3.5 min-w-0">
+                <div id="profile-avatar" class="w-14 h-14 rounded-2xl bg-[#15803D] text-white text-xl font-extrabold flex items-center justify-center shadow-sm shrink-0">
+                  U
+                </div>
+                <div class="min-w-0">
+                  <h2 id="profile-display-name" class="text-lg font-extrabold text-stone-900 truncate">User</h2>
+                  <p id="profile-username-label" class="text-xs text-stone-400 font-medium truncate">@username</p>
+                  <p id="profile-partner-badge" class="text-[11px] font-bold text-[#15803D] mt-1">ใช้งานคนเดียว (Solo)</p>
+                </div>
+              </div>
+              <button onclick="openEditProfileModal()" class="px-3 py-1.5 rounded-xl bg-[#F4F8F5] hover:bg-[#DCFCE7] text-stone-700 hover:text-[#166534] text-xs font-bold border border-[#D8E5DC] transition shrink-0">
+                แก้ไข
+              </button>
+            </div>
+          </div>
+
+          <!-- Share App & Scannable QR Code Card -->
+          <div class="soft-card rounded-[28px] p-5 space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <i class="fa-solid fa-qrcode text-[#15803D]"></i>
+                <h3 class="text-sm font-extrabold text-stone-900">แชร์เว็บแอป &amp; QR Code</h3>
+              </div>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#ECFDF5] text-[#15803D]">รองรับกล้อง iPhone</span>
+            </div>
+            <p class="text-xs text-stone-500 leading-relaxed">
+              สร้าง QR Code จากลิงก์เว็บสาธารณะ ดาวน์โหลดตัวแอป `.html` ส่งต่อให้เพื่อน หรือคัดลอกสรุปยอดรายเดือนส่งทางแชท
+            </p>
+            <div class="grid grid-cols-2 gap-2.5 pt-1">
+              <button onclick="openShareModal('link')" class="py-2.5 px-3 rounded-2xl bg-[#15803D] hover:bg-[#166534] text-white text-xs font-bold flex items-center justify-center gap-1.5 transition">
+                <i class="fa-solid fa-qrcode"></i>
+                <span>เปิดหน้าแชร์ / QR</span>
+              </button>
+              <button onclick="openShareModal('summary')" class="py-2.5 px-3 rounded-2xl bg-[#DCFCE7] hover:bg-emerald-200/70 text-[#166534] text-xs font-bold flex items-center justify-center gap-1.5 transition">
+                <i class="fa-regular fa-copy"></i>
+                <span>คัดลอกสรุปเดือนนี้</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Local Device Database Backup & Restore -->
+          <div class="soft-card rounded-[28px] p-5 space-y-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <i class="fa-solid fa-hard-drive text-[#15803D]"></i>
+                <h3 class="text-sm font-extrabold text-stone-900">สำรองและกู้คืนฐานข้อมูลในเครื่อง</h3>
+              </div>
+              <span id="db-engine-badge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                IndexedDB
+              </span>
+            </div>
+
+            <div class="bg-[#F4F8F5] rounded-2xl p-3.5 grid grid-cols-2 gap-3 border border-[#E1ECE4] text-xs">
+              <div>
+                <span class="text-[10px] font-bold uppercase text-stone-400 block">ข้อมูลในกระเป๋านี้</span>
+                <span id="db-stats-records" class="font-extrabold text-stone-800 mt-0.5 block">0 รายการ</span>
+              </div>
+              <div>
+                <span class="text-[10px] font-bold uppercase text-stone-400 block">บันทึกล่าสุด</span>
+                <span id="db-stats-saved" class="font-extrabold text-[#15803D] mt-0.5 block tabular-nums">-</span>
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <button onclick="exportDatabaseFileToDevice()" class="w-full py-3 px-4 rounded-2xl bg-[#F4F8F5] hover:bg-[#DCFCE7]/70 border border-[#D8E5DC] flex items-center justify-between text-left transition">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-xl bg-[#DCFCE7] text-[#166534] flex items-center justify-center">
+                    <i class="fa-solid fa-download text-xs"></i>
+                  </div>
+                  <div>
+                    <div class="text-xs font-extrabold text-stone-800">ส่งออกไฟล์ฐานข้อมูล (.JSON)</div>
+                    <div class="text-[10px] text-stone-500">สำรองข้อมูลทั้งหมดลงในโทรศัพท์ / PC</div>
+                  </div>
+                </div>
+                <i class="fa-solid fa-chevron-right text-[10px] text-stone-400"></i>
+              </button>
+
+              <label class="w-full py-3 px-4 rounded-2xl bg-[#F4F8F5] hover:bg-[#DCFCE7]/70 border border-[#D8E5DC] flex items-center justify-between text-left transition cursor-pointer">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-xl bg-teal-50 text-teal-700 flex items-center justify-center">
+                    <i class="fa-solid fa-file-import text-xs"></i>
+                  </div>
+                  <div>
+                    <div class="text-xs font-extrabold text-stone-800">นำเข้าไฟล์ฐานข้อมูล (.JSON)</div>
+                    <div class="text-[10px] text-stone-500">กู้คืนหรือซิงค์รายการจากไฟล์ในเครื่อง</div>
+                  </div>
+                </div>
+                <i class="fa-solid fa-chevron-right text-[10px] text-stone-400"></i>
+                <input type="file" accept=".json,application/json" onchange="handleImportWorkspaceJSON(event)" class="hidden" />
+              </label>
+
+              <button onclick="exportTransactionsCSV()" class="w-full py-3 px-4 rounded-2xl bg-[#F4F8F5] hover:bg-[#DCFCE7]/70 border border-[#D8E5DC] flex items-center justify-between text-left transition">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
+                    <i class="fa-solid fa-file-csv text-xs"></i>
+                  </div>
+                  <div>
+                    <div class="text-xs font-extrabold text-stone-800">ส่งออกตารางรายรับ-รายจ่าย (.CSV)</div>
+                    <div class="text-[10px] text-stone-500">UTF-8 BOM เปิดอ่านภาษาไทยใน Excel ได้ทันที</div>
+                  </div>
+                </div>
+                <i class="fa-solid fa-chevron-right text-[10px] text-stone-400"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Reset & Logout Actions -->
+          <div class="soft-card rounded-[28px] divide-y divide-[#E9F1EC] overflow-hidden">
+            <button onclick="confirmClearAccountData()" class="w-full px-5 py-3.5 flex items-center justify-between text-left hover:bg-amber-50/50 transition">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                  <i class="fa-solid fa-broom text-xs"></i>
+                </div>
+                <div>
+                  <div class="text-xs font-bold text-stone-800">ล้างข้อมูลรายการในบัญชีนี้</div>
+                  <div class="text-[10px] text-stone-400">รีเซ็ตยอดเป็นศูนย์เพื่อเริ่มต้นจดใหม่</div>
+                </div>
+              </div>
+              <i class="fa-solid fa-chevron-right text-[10px] text-stone-300"></i>
+            </button>
+
+            <button onclick="handleLogout()" class="w-full px-5 py-3.5 flex items-center justify-between text-left hover:bg-red-50/50 transition">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-xl bg-red-50 text-red-600 flex items-center justify-center">
+                  <i class="fa-solid fa-right-from-bracket text-xs"></i>
+                </div>
+                <div>
+                  <div class="text-xs font-bold text-red-600">สลับบัญชี / ออกจากระบบ (Logout)</div>
+                  <div class="text-[10px] text-stone-400">กลับสู่หน้าเข้าสู่ระบบ</div>
+                </div>
+              </div>
+              <i class="fa-solid fa-chevron-right text-[10px] text-red-400"></i>
+            </button>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- ========================================================= -->
+      <!-- BOTTOM NAVIGATION BAR                                     -->
+      <!-- ========================================================= -->
+      <nav class="bg-white border-t border-[#E1ECE4] px-2 pt-2 pb-3.5 flex items-center justify-around shrink-0 z-20 select-none">
+        <button onclick="switchTab('home')" id="nav-home" class="flex flex-col items-center gap-1 py-1 px-2 text-stone-400 transition">
+          <i class="fa-solid fa-house text-[18px]"></i>
+          <span class="text-[10px] font-semibold">Home</span>
+        </button>
+
+        <button onclick="switchTab('shopping')" id="nav-shopping" class="relative flex flex-col items-center gap-1 py-1 px-2 text-stone-400 transition">
+          <div class="relative">
+            <i class="fa-solid fa-cart-shopping text-[18px]"></i>
+            <span id="nav-shopping-badge" class="hidden absolute -top-1.5 -right-2.5 w-4 h-4 rounded-full bg-[#15803D] text-white text-[9px] font-extrabold items-center justify-center">
+              0
+            </span>
+          </div>
+          <span class="text-[10px] font-semibold">Shopping</span>
+        </button>
+
+        <button onclick="switchTab('calendar')" id="nav-calendar" class="flex flex-col items-center gap-1 py-1 px-2 text-stone-400 transition">
+          <i class="fa-solid fa-calendar-days text-[18px]"></i>
+          <span class="text-[10px] font-semibold">Calendar</span>
+        </button>
+
+        <button onclick="switchTab('pet')" id="nav-pet" class="flex flex-col items-center gap-1 py-1 px-2 text-stone-400 transition">
+          <i class="fa-solid fa-paw text-[18px]"></i>
+          <span class="text-[10px] font-semibold">Pet</span>
+        </button>
+
+        <button onclick="switchTab('finance')" id="nav-finance" class="flex flex-col items-center gap-1 py-1 px-2 text-[#15803D] transition">
+          <i class="fa-solid fa-wallet text-[18px]"></i>
+          <span class="text-[10px] font-bold">Finance</span>
+        </button>
+
+        <button onclick="switchTab('profile')" id="nav-profile" class="flex flex-col items-center gap-1 py-1 px-2 text-stone-400 transition">
+          <i class="fa-solid fa-user text-[18px]"></i>
+          <span class="text-[10px] font-semibold">Profile</span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- MODAL 1: ADD / EDIT TRANSACTION                           -->
+    <!-- ========================================================= -->
+    <div id="tx-modal" class="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
+      <div class="w-full max-w-[430px] bg-[#F4F8F5] rounded-t-[32px] sm:rounded-[32px] p-6 shadow-2xl animate-slide-up max-h-[92vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-4">
+          <h3 id="tx-modal-heading" class="text-lg font-extrabold text-stone-900">บันทึกรายการรับ - จ่าย</h3>
+          <button onclick="closeTransactionModal()" class="w-8 h-8 rounded-full bg-[#E1ECE4] text-stone-600 flex items-center justify-center">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <form onsubmit="handleSaveTransaction(event)" class="space-y-4">
+          <input type="hidden" id="tx-edit-id" value="" />
+
+          <div class="bg-[#E1ECE4] p-1 rounded-2xl grid grid-cols-2 gap-1">
+            <button type="button" id="modal-type-expense" onclick="setModalTxType('expense')" class="py-2.5 rounded-xl text-xs font-extrabold bg-[#15803D] text-white shadow-xs transition">
+              รายจ่าย (Expense)
+            </button>
+            <button type="button" id="modal-type-income" onclick="setModalTxType('income')" class="py-2.5 rounded-xl text-xs font-extrabold text-stone-600 transition">
+              รายรับ (Income)
+            </button>
+          </div>
+
+          <div class="soft-card rounded-2xl p-4 space-y-3">
+            <div>
+              <label class="block text-[11px] font-bold uppercase text-stone-400 mb-1">ชื่อรายการ *</label>
+              <input id="tx-title-input" type="text" required placeholder="เช่น ค่าเน็ต, ค่าอาหาร, เงินเดือน..."
+                class="w-full px-3.5 py-2.5 rounded-xl bg-[#F4F8F5] border border-[#D8E5DC] text-sm font-semibold text-stone-800 focus:outline-none focus:border-[#15803D]" />
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[11px] font-bold uppercase text-stone-400 mb-1">จำนวนเงิน (฿) *</label>
+                <input id="tx-amount-input" type="number" step="0.01" min="0.01" required placeholder="0.00"
+                  class="w-full px-3.5 py-2.5 rounded-xl bg-[#F4F8F5] border border-[#D8E5DC] text-base font-extrabold text-stone-900 focus:outline-none focus:border-[#15803D]" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold uppercase text-stone-400 mb-1">วันที่ *</label>
+                <input id="tx-date-input" type="date" min="2024-01-01" max="2032-12-31" required
+                  class="w-full px-3 py-2.5 rounded-xl bg-[#F4F8F5] border border-[#D8E5DC] text-xs font-bold text-stone-800 focus:outline-none focus:border-[#15803D]" />
+              </div>
+            </div>
+          </div>
+
+          <div class="soft-card rounded-2xl p-4 space-y-3">
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[11px] font-bold uppercase text-stone-400 mb-1">หมวดหมู่</label>
+                <select id="tx-category-input" class="w-full px-3 py-2.5 rounded-xl bg-[#F4F8F5] border border-[#D8E5DC] text-xs font-bold text-stone-800 focus:outline-none focus:border-[#15803D]"></select>
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold uppercase text-stone-400 mb-1">ผู้ทำรายการ</label>
+                <select id="tx-payer-input" class="w-full px-3 py-2.5 rounded-xl bg-[#F4F8F5] border border-[#D8E5DC] text-xs font-bold text-stone-800 focus:outline-none focus:border-[#15803D]"></select>
+              </div>
+            </div>
+
+            <div class="pt-1 flex items-center justify-between">
+              <span class="text-xs font-bold text-stone-600">สถานะการเคลียร์ยอด</span>
+              <div class="flex items-center gap-3">
+                <label class="inline-flex items-center gap-1.5 text-xs font-bold text-[#15803D] cursor-pointer">
+                  <input type="radio" name="tx-status" value="settled" checked class="accent-[#15803D]" />
+                  <span>เคลียร์แล้ว (✓)</span>
+                </label>
+                <label class="inline-flex items-center gap-1.5 text-xs font-bold text-amber-600 cursor-pointer">
+                  <input type="radio" name="tx-status" value="pending" class="accent-amber-500" />
+                  <span>รอเคลียร์ยอด</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="w-full py-3.5 rounded-2xl bg-[#15803D] hover:bg-[#166534] text-white font-bold text-sm shadow-lg shadow-emerald-900/15 transition">
+            บันทึกรายการ
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- MODAL 2: ADD BUDGET CATEGORY                              -->
+    <!-- ========================================================= -->
+    <div id="budget-modal" class="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
+      <div class="w-full max-w-[400px] bg-[#F4F8F5] rounded-t-[32px] sm:rounded-[32px] p-6 shadow-2xl animate-slide-up">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-extrabold text-stone-900">เพิ่มหมวดหมู่งบประมาณ</h3>
+          <button onclick="closeBudgetModal()" class="w-8 h-8 rounded-full bg-[#E1ECE4] text-stone-600 flex items-center justify-center">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <form onsubmit="handleSaveBudget(event)" class="space-y-4">
+          <div>
+            <label class="block text-[11px] font-bold uppercase text-stone-400 mb-1">ชื่อหมวดหมู่ *</label>
+            <input id="budget-name-input" type="text" required placeholder="เช่น อาหาร, ค่าน้ำ-ค่าไฟ, สัตว์เลี้ยง..."
+              class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#D8E5DC] text-sm font-semibold text-stone-800 focus:outline-none focus:border-[#15803D]" />
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold uppercase text-stone-400 mb-1">งบประมาณต่อเดือน (฿) *</label>
+            <input id="budget-limit-input" type="number" min="1" step="any" required placeholder="เช่น 4000"
+              class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#D8E5DC] text-base font-extrabold text-stone-900 focus:outline-none focus:border-[#15803D]" />
+          </div>
+          <button type="submit" class="w-full py-3.5 rounded-2xl bg-[#15803D] hover:bg-[#166534] text-white font-bold text-sm">
+            บันทึกหมวดหมู่
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- MODAL 3: ADD CALENDAR EVENT (2024 - 2032)                 -->
+    <!-- ========================================================= -->
+    <div id="event-modal" class="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
+      <div class="w-full max-w-[400px] bg-[#F4F8F5] rounded-t-[32px] sm:rounded-[32px] p-6 shadow-2xl animate-slide-up">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-extrabold text-stone-900">เพิ่มกิจกรรมในปฏิทิน</h3>
+          <button onclick="closeAddEventModal()" class="w-8 h-8 rounded-full bg-[#E1ECE4] text-stone-600 flex items-center justify-center">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <form onsubmit="handleSaveEvent(event)" class="space-y-3.5">
+          <div>
+            <label class="block text-[11px] font-bold uppercase text-stone-400 mb-1">วันที่ (รองรับถึงปี 2032) *</label>
+            <input id="event-date-input" type="date" min="2024-01-01" max="2032-12-31" required
+              class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#D8E5DC] text-xs font-bold text-stone-800 focus:outline-none focus:border-[#15803D]" />
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold uppercase text-stone-400 mb-1">ชื่อกิจกรรม / นัดหมาย *</label>
+            <input id="event-title-input" type="text" required placeholder="เช่น จ่ายค่าไฟ, พาสัตว์เลี้ยงฉีดวัคซีน..."
+              class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#D8E5DC] text-sm font-semibold text-stone-800 focus:outline-none focus:border-[#15803D]" />
+          </div>
+          <div class="grid grid-cols-2 gap-2.5">
+            <div>
+              <label class="block text-[11px] font-bold uppercase text-stone-400 mb-1">เวลา (ถ้ามี)</label>
+              <input id="event-time-input" type="time"
+                class="w-full px-3 py-2 rounded-xl bg-white border border-[#D8E5DC] text-xs font-bold text-stone-800 focus:outline-none focus:border-[#15803D]" />
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold uppercase text-stone-400 mb-1">ป้ายกำกับ</label>
+              <select id="event-scope-input" class="w-full px-3 py-2 rounded-xl bg-white border border-[#D8E5DC] text-xs font-bold text-stone-800 focus:outline-none focus:border-[#15803D]">
+                <option value="Shared">Shared (ร่วมกัน)</option>
+                <option value="Personal">Personal (ส่วนตัว)</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="w-full py-3.5 rounded-2xl bg-[#15803D] hover:bg-[#166534] text-white font-bold text-sm">
+            บันทึกกิจกรรม
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- MODAL 4: ADD PET PROFILE (EMOJI + PHOTO DATAURL)          -->
+    <!-- ========================================================= -->
+    <div id="pet-modal" class="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
+      <div class="w-full max-w-[415px] bg-[#F4F8F5] rounded-t-[32px] sm:rounded-[32px] p-6 shadow-2xl animate-slide-up max-h-[92vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-extrabold text-stone-900">เพิ่มโปรไฟล์สัตว์เลี้ยง</h3>
+          <button onclick="closeAddPetModal()" class="w-8 h-8 rounded-full bg-[#E1ECE4] text-stone-600 flex items-center justify-center">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <form onsubmit="handleSavePet(event)" class="space-y-3">
+          <div>
+            <label class="block text-[11px] font-bold uppercase text-stone-400 mb-1.5">เลือกไอคอนสัตว์เลี้ยง</label>
+            <div class="flex items-center gap-2" id="pet-emoji-picker">
+              <button type="button" onclick="selectPetEmoji('🐶')" data-emoji="🐶" class="w-10 h-10 rounded-xl bg-[#DCFCE7] ring-2 ring-[#15803D] text-lg">🐶</button>
+              <button type="button" onclick="selectPetEmoji('🐱')" data-emoji="🐱" class="w-10 h-10 rounded-xl bg-white border border-[#D8E5DC] text-lg">🐱</button>
+              <button type="button" onclick="selectPetEmoji('🐰')" data-emoji="🐰" class="w-10 h-10 rounded-xl bg-white border border-[#D8E5DC] text-lg">🐰</button>
+              <button type="button" onclick="selectPetEmoji('🐹')" data-emoji="🐹" class="w-10 h-10 rounded-xl bg-white border border-[#D8E5DC] text-lg">🐹</button>
+              <button type="button" onclick="selectPetEmoji('🦜')" data-emoji="🦜" class="w-10 h-10 rounded-xl bg-white border border-[#D8E5DC] text-lg">🦜</button>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-2.5">
+            <input id="pet-name-input" type="text" required placeholder="ชื่อสัตว์เลี้ยง *" class="px-3.5 py-2.5 rounded-xl bg-white border border-[#D8E5DC] text-sm font-semibold focus:outline-none focus:border-[#15803D]" />
+            <select id="pet-gender-input" class="px-3.5 py-2.5 rounded-xl bg-white border border-[#D8E5DC] text-sm font-semibold focus:outline-none focus:border-[#15803D]">
+              <option value="Female">Female (ตัวเมีย)</option>
+              <option value="Male">Male (ตัวผู้)</option>
+            </select>
+          </div>
+          <input id="pet-breed-input" type="text" required placeholder="สายพันธุ์ (เช่น Persian Cat, Cocker Spaniel) *" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#D8E5DC] text-sm font-semibold focus:outline-none focus:border-[#15803D]" />
+          <div class="grid grid-cols-2 gap-2.5">
+            <input id="pet-age-input" type="text" placeholder="อายุ (เช่น 1 yr 10 mo)" class="px-3.5 py-2.5 rounded-xl bg-white border border-[#D8E5DC] text-sm font-semibold focus:outline-none focus:border-[#15803D]" />
+            <input id="pet-weight-input" type="text" placeholder="น้ำหนัก (เช่น 4.2 Kg)" class="px-3.5 py-2.5 rounded-xl bg-white border border-[#D8E5DC] text-sm font-semibold focus:outline-none focus:border-[#15803D]" />
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold uppercase text-stone-400 mb-1">วันฉีดวัคซีนล่าสุด / นัดถัดไป</label>
+            <input id="pet-vaccine-input" type="date" min="2024-01-01" max="2032-12-31" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#D8E5DC] text-xs font-bold text-stone-800 focus:outline-none focus:border-[#15803D]" />
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold uppercase text-stone-400 mb-1">อัปโหลดรูปถ่ายสัตว์เลี้ยง (เก็บในเครื่อง)</label>
+            <input id="pet-photo-input" type="file" accept="image/*" class="w-full text-xs text-stone-500 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#DCFCE7] file:text-[#166534]" />
+          </div>
+          <button type="submit" class="w-full py-3.5 rounded-2xl bg-[#15803D] hover:bg-[#166534] text-white font-bold text-sm">
+            บันทึกโปรไฟล์สัตว์เลี้ยง
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- MODAL 5: EDIT PROFILE & SOLO/SHARED MODE                  -->
+    <!-- ========================================================= -->
+    <div id="profile-modal" class="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
+      <div class="w-full max-w-[400px] bg-[#F4F8F5] rounded-t-[32px] sm:rounded-[32px] p-6 shadow-2xl animate-slide-up">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-extrabold text-stone-900">แก้ไขโปรไฟล์ &amp; โหมดกระเป๋า</h3>
+          <button onclick="closeEditProfileModal()" class="w-8 h-8 rounded-full bg-[#E1ECE4] text-stone-600 flex items-center justify-center">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <form onsubmit="handleSaveProfile(event)" class="space-y-3.5">
+          <div>
+            <label class="block text-[11px] font-bold uppercase text-stone-400 mb-1">ชื่อของคุณ *</label>
+            <input id="edit-displayname-input" type="text" required class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#D8E5DC] text-sm font-semibold focus:outline-none focus:border-[#15803D]" />
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold uppercase text-stone-400 mb-1">ชื่อคู่หู / คนหารร่วม (เว้นว่างหากใช้งานคนเดียว)</label>
+            <input id="edit-partner-input" type="text" placeholder="ระบุชื่อเพื่อเปิดโหมด Shared Expenses" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#D8E5DC] text-sm font-semibold focus:outline-none focus:border-[#15803D]" />
+          </div>
+          <button type="submit" class="w-full py-3.5 rounded-2xl bg-[#15803D] hover:bg-[#166534] text-white font-bold text-sm">
+            บันทึกการเปลี่ยนแปลง
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- MODAL 6: SMART SHARE & SCANNABLE QR CODE (iPhone FIXED!)  -->
+    <!-- ========================================================= -->
+    <div id="share-modal" class="fixed inset-0 z-50 bg-black/45 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
+      <div class="w-full max-w-[435px] bg-[#F4F8F5] rounded-t-[32px] sm:rounded-[32px] p-6 shadow-2xl animate-slide-up max-h-[92vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-xl bg-[#DCFCE7] text-[#166534] flex items-center justify-center">
+              <i class="fa-solid fa-qrcode text-sm"></i>
+            </div>
+            <h3 class="text-lg font-extrabold text-stone-900">แชร์เว็บแอป &amp; QR Code</h3>
+          </div>
+          <button onclick="closeShareModal()" class="w-8 h-8 rounded-full bg-[#E1ECE4] text-stone-600 flex items-center justify-center">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <!-- Share Mode Switcher -->
+        <div class="bg-[#E1ECE4] p-1 rounded-2xl grid grid-cols-2 gap-1 mb-4">
+          <button type="button" id="share-tab-link" onclick="switchShareTab('link')" class="py-2 rounded-xl text-xs font-bold bg-white text-[#166534] shadow-2xs transition">
+            แชร์แอป / QR Code
+          </button>
+          <button type="button" id="share-tab-summary" onclick="switchShareTab('summary')" class="py-2 rounded-xl text-xs font-bold text-stone-600 transition">
+            คัดลอกสรุปรายเดือน
+          </button>
+        </div>
+
+        <!-- PANEL 1: SMART QR CODE & STANDALONE HTML DOWNLOAD -->
+        <div id="share-panel-link" class="space-y-4">
+
+          <!-- CASE A: PREVIEW / SANDBOX NOTICE (Shown when no public https:// URL is set yet) -->
+          <div id="share-preview-notice" class="soft-card rounded-3xl p-4 space-y-3 border-emerald-200 bg-white hidden">
+            <div class="flex items-start gap-3">
+              <div class="w-9 h-9 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 mt-0.5">
+                <i class="fa-solid fa-circle-info"></i>
+              </div>
+              <div>
+                <h4 class="text-xs font-extrabold text-stone-900 leading-snug">
+                  ขณะนี้เปิดอยู่ในโหมด Preview ยังไม่มีลิงก์เว็บไซต์สาธารณะ
+                </h4>
+                <p class="text-[11px] text-stone-500 mt-1 leading-relaxed">
+                  หน้าต่าง Preview ใช้ที่อยู่จำลองภายในระบบ จึงไม่แสดง QR Code จำลองเพื่อป้องกันกล้อง iPhone แจ้งว่า <span class="font-semibold text-stone-700">"No usable data found"</span>
+                </p>
+              </div>
+            </div>
+
+            <div class="bg-[#F4F8F5] rounded-2xl p-3.5 space-y-2.5 text-[11px] text-stone-700 border border-[#E1ECE4]">
+              <div class="flex items-start gap-2">
+                <span class="w-5 h-5 rounded-full bg-[#15803D] text-white text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">1</span>
+                <p class="leading-relaxed">
+                  <strong>สร้าง QR Code สแกนได้จริง:</strong> กดปุ่มแชร์ของหน้าต่าง Preview ด้านบน หรืออัปโหลดไฟล์แอปขึ้นเว็บฟรีอย่าง <span class="font-bold text-[#166534]">Netlify Drop (app.netlify.com/drop)</span> แล้วนำลิงก์ <code class="bg-white px-1 py-0.5 rounded border text-[10px]">https://...</code> มาวางในช่องด้านล่าง
+                </p>
+              </div>
+              <div class="flex items-start gap-2">
+                <span class="w-5 h-5 rounded-full bg-[#15803D] text-white text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">2</span>
+                <p class="leading-relaxed">
+                  <strong>ส่งไฟล์แอปให้เพื่อนทันที:</strong> กดปุ่มดาวน์โหลดไฟล์เว็บแอป <code class="bg-white px-1 py-0.5 rounded border text-[10px]">.html</code> ด้านล่างเพื่อส่งต่อทาง LINE / AirDrop หรือนำไปโฮสต์ขึ้นเว็บฟรีได้ทันที
+                </p>
+              </div>
+            </div>
+
+            <button type="button" onclick="downloadStandaloneHTMLApp()" class="w-full py-3 rounded-2xl bg-[#15803D] hover:bg-[#166534] text-white text-xs font-bold flex items-center justify-center gap-2 shadow-md shadow-emerald-900/15 transition active:scale-[0.99]">
+              <i class="fa-solid fa-file-arrow-down text-sm"></i>
+              <span>ดาวน์โหลดไฟล์เว็บแอป (.html)</span>
+            </button>
+          </div>
+
+          <!-- CASE B: GENUINE HIGH-CONTRAST SCANNABLE QR CODE (Shown ONLY when valid http/https URL exists) -->
+          <div id="share-valid-qr-card" class="soft-card rounded-3xl p-5 flex flex-col items-center text-center hidden">
+            <div class="p-3 bg-white rounded-2xl border-2 border-stone-200 shadow-xs mb-3 flex items-center justify-center">
+              <canvas id="share-qr-canvas" class="block rounded-lg"></canvas>
+              <img id="share-qr-fallback-img" alt="QR Code" class="hidden w-[220px] h-[220px] object-contain" />
+            </div>
+            <span class="inline-flex items-center gap-1.5 text-[11px] font-bold text-[#166534] bg-[#DCFCE7] px-3 py-1 rounded-full">
+              <i class="fa-solid fa-circle-check"></i>
+              <span>พร้อมสแกนด้วยกล้อง iPhone / Android</span>
+            </span>
+            <p id="share-qr-encoded-url" class="text-[11px] text-stone-500 mt-2 break-all px-2 font-medium"></p>
+
+            <div class="grid grid-cols-3 gap-2 w-full mt-4">
+              <button type="button" onclick="copyConfiguredShareUrl()" class="py-2.5 px-2 rounded-xl bg-[#DCFCE7] hover:bg-emerald-200 text-[#166534] text-[11px] font-bold flex items-center justify-center gap-1 transition">
+                <i class="fa-regular fa-copy"></i>
+                <span>คัดลอกลิงก์</span>
+              </button>
+              <button type="button" onclick="triggerNativeShareUrl()" class="py-2.5 px-2 rounded-xl bg-[#15803D] hover:bg-[#166534] text-white text-[11px] font-bold flex items-center justify-center gap-1 transition">
+                <i class="fa-solid fa-share-nodes"></i>
+                <span>แชร์ลิงก์</span>
+              </button>
+              <button type="button" onclick="downloadQRImagePNG()" class="py-2.5 px-2 rounded-xl bg-[#F4F8F5] hover:bg-[#E1ECE4] text-stone-700 border border-[#D8E5DC] text-[11px] font-bold flex items-center justify-center gap-1 transition">
+                <i class="fa-solid fa-download"></i>
+                <span>รูป QR</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Editable Public App URL Box (Saved to IndexedDB GreenFinanceDB) -->
+          <div class="soft-card rounded-2xl p-4 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <label for="public-share-url-input" class="text-[11px] font-extrabold text-stone-700">
+                ลิงก์สาธารณะของเว็บแอป (https://...)
+              </label>
+              <button type="button" id="clear-share-url-btn" onclick="clearSavedShareUrl()" class="hidden text-[10px] font-bold text-stone-400 hover:text-red-500">
+                ล้างลิงก์
+              </button>
+            </div>
+            <div class="flex items-center gap-2">
+              <input id="public-share-url-input" type="url" inputmode="url" placeholder="วางลิงก์ เช่น https://my-finance.netlify.app"
+                oninput="handlePublicShareUrlInput()"
+                class="flex-1 px-3 py-2.5 rounded-xl bg-[#F4F8F5] border border-[#D8E5DC] text-xs font-semibold text-stone-800 focus:outline-none focus:border-[#15803D] min-w-0" />
+              <button type="button" onclick="applyAndSaveShareUrl()" class="px-3.5 py-2.5 rounded-xl bg-[#15803D] hover:bg-[#166534] text-white text-xs font-bold shrink-0 transition">
+                สร้าง QR
+              </button>
+            </div>
+            <p id="share-url-validation-msg" class="text-[10px] text-stone-400">
+              บันทึกในเครื่องอัตโนมัติ · หากเปิดใช้งานผ่านโดเมนจริง ระบบจะดึงลิงก์ให้อัตโนมัติ
+            </p>
+          </div>
+
+          <!-- Secondary Standalone HTML Download Button when QR Card is visible -->
+          <div id="share-extra-html-btn-wrap" class="hidden">
+            <button type="button" onclick="downloadStandaloneHTMLApp()" class="w-full py-2.5 rounded-2xl bg-white hover:bg-[#ECFDF5] text-[#166534] border border-[#D8E5DC] text-xs font-bold flex items-center justify-center gap-2 transition">
+              <i class="fa-solid fa-code text-xs"></i>
+              <span>ดาวน์โหลดไฟล์เว็บแอป (.html) ส่งทาง LINE / AirDrop</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- PANEL 2: COPY MONTHLY INCOME/EXPENSE SUMMARY -->
+        <div id="share-panel-summary" class="space-y-4 hidden">
+          <div class="soft-card rounded-2xl p-4">
+            <label class="block text-[11px] font-bold uppercase text-stone-400 mb-2">ข้อความสรุปรายรับ-รายจ่ายเดือนนี้</label>
+            <textarea id="share-summary-textarea" rows="8" readonly class="w-full text-xs font-medium text-stone-700 bg-[#F4F8F5] rounded-xl p-3 border border-[#D8E5DC] focus:outline-none resize-none leading-relaxed"></textarea>
+          </div>
+          <div class="grid grid-cols-2 gap-2.5">
+            <button type="button" onclick="copySummaryText()" class="py-3 rounded-2xl bg-[#DCFCE7] hover:bg-emerald-200 text-[#166534] text-xs font-bold flex items-center justify-center gap-1.5 transition">
+              <i class="fa-regular fa-copy"></i>
+              <span>คัดลอกสรุปรายรับ-รายจ่ายเดือนนี้</span>
+            </button>
+            <button type="button" onclick="shareSummaryNative()" class="py-3 rounded-2xl bg-[#15803D] hover:bg-[#166534] text-white text-xs font-bold flex items-center justify-center gap-1.5 transition">
+              <i class="fa-solid fa-paper-plane"></i>
+              <span>ส่งทางแชททันที</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- MODAL 7: CUSTOM CONFIRMATION DIALOG (NO NATIVE ALERT)     -->
+    <!-- ========================================================= -->
+    <div id="confirm-modal" class="fixed inset-0 z-50 bg-black/45 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+      <div class="w-full max-w-[360px] bg-white rounded-[28px] p-6 shadow-2xl animate-fade-in space-y-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+          </div>
+          <h3 id="confirm-modal-title" class="text-base font-extrabold text-stone-900">ยืนยันการทำรายการ</h3>
+        </div>
+        <p id="confirm-modal-msg" class="text-xs text-stone-500 leading-relaxed"></p>
+        <div class="grid grid-cols-2 gap-2.5 pt-1">
+          <button onclick="closeConfirmModal()" class="py-2.5 rounded-xl bg-[#F4F8F5] text-stone-700 text-xs font-bold border border-[#D8E5DC]">
+            ยกเลิก
+          </button>
+          <button id="confirm-modal-action-btn" class="py-2.5 rounded-xl bg-red-600 text-white text-xs font-bold">
+            ยืนยัน
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast-banner" class="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 bg-stone-900 text-white text-xs font-bold px-4 py-2.5 rounded-full shadow-lg pointer-events-none opacity-0 transition-opacity duration-200 whitespace-nowrap">
+      บันทึกสำเร็จ
+    </div>
+
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MAIN JAVASCRIPT ENGINE                                    -->
+  <!-- ========================================================= -->
+  <script>
+    // ===========================================================
+    // 1. CONSTANTS, CATEGORIES & GEOMETRIC MOOD FACES
+    // ===========================================================
+    const MIN_YEAR = 2024;
+    const MAX_YEAR = 2032; // Covers 2030+ seamlessly
+
+    const THAI_MONTHS = [
+      'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
+      'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
+    ];
+    const SHORT_THAI_MONTHS = [
+      'ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.',
+      'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'
+    ];
+    const SHORT_DAYS_TH = ['อา.', 'จ.', 'อ.', 'พ.', 'พฤ.', 'ศ.', 'ส.'];
+
+    const CATEGORY_META = {
+      'อาหารและเครื่องดื่ม': { bg: '#ECFDF5', color: '#059669', icon: 'fa-solid fa-utensils' },
+      'ค่าน้ำ-ค่าไฟ-เน็ต':   { bg: '#F0FDFA', color: '#0D9488', icon: 'fa-solid fa-file-invoice' },
+      'ของใช้ในบ้าน':        { bg: '#E9F3EC', color: '#15803D', icon: 'fa-solid fa-broom' },
+      'เดินทาง':             { bg: '#F0F9FF', color: '#0284C7', icon: 'fa-solid fa-car' },
+      'คาเฟ่และเครื่องดื่ม': { bg: '#FEFCE8', color: '#CA8A04', icon: 'fa-solid fa-mug-saucer' },
+      'สัตว์เลี้ยง':         { bg: '#FDF2F8', color: '#DB2777', icon: 'fa-solid fa-paw' },
+      'ค่าส่วนกลาง/ที่พัก':  { bg: '#F1F5F9', color: '#475569', icon: 'fa-solid fa-building' },
+      'สุขภาพ':              { bg: '#F0FDF4', color: '#16A34A', icon: 'fa-solid fa-notes-medical' },
+      'เงินออม':             { bg: '#DCFCE7', color: '#166534', icon: 'fa-solid fa-piggy-bank' },
+      'เงินเดือน / รายรับ':  { bg: '#DCFCE7', color: '#15803D', icon: 'fa-solid fa-coins' }
+    };
+
+    const SHOPPING_CATEGORIES = [
+      { id: 'ทั้งหมด', icon: 'fa-solid fa-border-all' },
+      { id: 'อาหาร', icon: 'fa-solid fa-utensils' },
+      { id: 'ของใช้ในบ้าน', icon: 'fa-solid fa-house' },
+      { id: 'สุขภาพ', icon: 'fa-solid fa-notes-medical' },
+      { id: 'สัตว์เลี้ยง', icon: 'fa-solid fa-paw' }
+    ];
+
+    // Cute Geometric Mood Icons matching the reference layout
+    const MOOD_META = {
+      Happy: {
+        color: '#F9A8D4',
+        label: 'Happy',
+        thLabel: 'อารมณ์ดี',
+        shapeClass: 'rounded-full w-11 h-11',
+        svg: `<svg viewBox="0 0 36 36" class="w-7 h-7"><path d="M10 15q2-2.5 4 0M22 15q2-2.5 4 0" stroke="#292524" stroke-width="2.2" fill="none" stroke-linecap="round"/><path d="M12 21q6 5 12 0" stroke="#292524" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg>`
+      },
+      Calm: {
+        color: '#A78BFA',
+        label: 'Calm',
+        thLabel: 'สงบสบายใจ',
+        shapeClass: 'rounded-xl w-10 h-10',
+        svg: `<svg viewBox="0 0 36 36" class="w-6 h-6"><circle cx="13" cy="15" r="1.6" fill="#292524"/><circle cx="23" cy="15" r="1.6" fill="#292524"/><path d="M13 21q5 3.5 10 0" stroke="#292524" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg>`
+      },
+      Sad: {
+        color: '#38BDF8',
+        label: 'Sad',
+        thLabel: 'ซึม / เศร้า',
+        shapeClass: 'rounded-2xl w-10 h-11',
+        svg: `<svg viewBox="0 0 36 36" class="w-6 h-6"><circle cx="13" cy="15" r="1.6" fill="#292524"/><circle cx="23" cy="15" r="1.6" fill="#292524"/><path d="M13 23q5-3.5 10 0" stroke="#292524" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg>`
+      },
+      Angry: {
+        color: '#FB923C',
+        label: 'Angry',
+        thLabel: 'หงุดหงิด',
+        shapeClass: 'rounded-xl w-10 h-10',
+        svg: `<svg viewBox="0 0 36 36" class="w-6 h-6"><path d="M10 13l5 2.5-5 2.5M26 13l-5 2.5 5 2.5" stroke="#292524" stroke-width="2.1" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="13" y1="23" x2="23" y2="23" stroke="#292524" stroke-width="2.2" stroke-linecap="round"/></svg>`
+      },
+      Tired: {
+        color: '#FBBF24',
+        label: 'Tired',
+        thLabel: 'เหนื่อยล้า',
+        shapeClass: 'rounded-full w-11 h-11',
+        svg: `<svg viewBox="0 0 36 36" class="w-7 h-7"><line x1="10" y1="16" x2="15" y2="16" stroke="#292524" stroke-width="2.2" stroke-linecap="round"/><line x1="21" y1="16" x2="26" y2="16" stroke="#292524" stroke-width="2.2" stroke-linecap="round"/><path d="M14 23q4-2 8 0" stroke="#292524" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg>`
+      }
+    };
+
+    // ===========================================================
+    // 2. REAL-TIME CLOCK & THAI DATE HELPERS
+    // ===========================================================
+    function getTodayDateParts() {
+      const now = new Date();
+      const yyyy = now.getFullYear();
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      const dd = String(now.getDate()).padStart(2, '0');
+      return {
+        year: yyyy,
+        month: now.getMonth(),
+        day: now.getDate(),
+        iso: `${yyyy}-${mm}-${dd}`,
+        now
+      };
+    }
+
+    function formatDisplayDate(isoStr) {
+      if (!isoStr) return '-';
+      const todayIso = getTodayDateParts().iso;
+      if (isoStr === todayIso) return 'วันนี้';
+      const parts = isoStr.split('-');
+      if (parts.length !== 3) return isoStr;
+      const y = parseInt(parts[0], 10);
+      const m = parseInt(parts[1], 10) - 1;
+      const d = parseInt(parts[2], 10);
+      return `${d} ${SHORT_THAI_MONTHS[m] || ''} ${y}`;
+    }
+
+    function updateRealTimeClock() {
+      const now = new Date();
+      const hh = String(now.getHours()).padStart(2, '0');
+      const mm = String(now.getMinutes()).padStart(2, '0');
+      const ss = String(now.getSeconds()).padStart(2, '0');
+      const dayName = SHORT_DAYS_TH[now.getDay()];
+      const d = now.getDate();
+      const mName = SHORT_THAI_MONTHS[now.getMonth()];
+      const y = now.getFullYear();
+
+      const clockEl = document.getElementById('realtime-clock');
+      const dateEl = document.getElementById('realtime-date');
+      if (clockEl) clockEl.textContent = `${hh}:${mm}:${ss}`;
+      if (dateEl) dateEl.textContent = `${dayName} ${d} ${mName} ${y}`;
+
+      const greetEl = document.getElementById('home-live-greeting');
+      if (greetEl) {
+        const hr = now.getHours();
+        const greet = hr < 12 ? 'สวัสดีตอนเช้า' : hr < 17 ? 'สวัสดีตอนบ่าย' : 'สวัสดีตอนเย็น';
+        greetEl.textContent = `${greet} · ${hh}:${mm}`;
+      }
+    }
+
+    // ===========================================================
+    // 3. LOCAL DEVICE DATABASE (IndexedDB: GreenFinanceDB)
+    // ===========================================================
+    const LocalDB = {
+      dbName: 'GreenFinanceDB',
+      dbVersion: 1,
+      db: null,
+      usingFallback: false,
+
+      async init() {
+        if (navigator.storage && navigator.storage.persist) {
+          try { await navigator.storage.persist(); } catch (_) {}
+        }
+        return new Promise((resolve) => {
+          if (!window.indexedDB) {
+            this.usingFallback = true;
+            resolve();
+            return;
+          }
+          try {
+            const req = indexedDB.open(this.dbName, this.dbVersion);
+            req.onupgradeneeded = (e) => {
+              const db = e.target.result;
+              if (!db.objectStoreNames.contains('users')) {
+                db.createObjectStore('users', { keyPath: 'username' });
+              }
+              if (!db.objectStoreNames.contains('workspaces')) {
+                db.createObjectStore('workspaces', { keyPath: 'username' });
+              }
+              if (!db.objectStoreNames.contains('meta')) {
+                db.createObjectStore('meta', { keyPath: 'key' });
+              }
+            };
+            req.onsuccess = (e) => {
+              this.db = e.target.result;
+              resolve();
+            };
+            req.onerror = () => {
+              this.usingFallback = true;
+              resolve();
+            };
+          } catch (_) {
+            this.usingFallback = true;
+            resolve();
+          }
+        });
+      },
+
+      async getAll(storeName) {
+        if (this.usingFallback || !this.db) {
+          const raw = localStorage.getItem(`${this.dbName}_${storeName}`);
+          return raw ? JSON.parse(raw) : [];
+        }
+        return new Promise((resolve) => {
+          const tx = this.db.transaction(storeName, 'readonly');
+          const req = tx.objectStore(storeName).getAll();
+          req.onsuccess = () => resolve(req.result || []);
+          req.onerror = () => resolve([]);
+        });
+      },
+
+      async get(storeName, key) {
+        if (this.usingFallback || !this.db) {
+          const list = await this.getAll(storeName);
+          const kp = storeName === 'meta' ? 'key' : 'username';
+          return list.find(item => item[kp] === key) || null;
+        }
+        return new Promise((resolve) => {
+          const tx = this.db.transaction(storeName, 'readonly');
+          const req = tx.objectStore(storeName).get(key);
+          req.onsuccess = () => resolve(req.result || null);
+          req.onerror = () => resolve(null);
+        });
+      },
+
+      async put(storeName, value) {
+        if (this.usingFallback || !this.db) {
+          const list = await this.getAll(storeName);
+          const kp = storeName === 'meta' ? 'key' : 'username';
+          const idx = list.findIndex(item => item[kp] === value[kp]);
+          if (idx >= 0) list[idx] = value;
+          else list.push(value);
+          localStorage.setItem(`${this.dbName}_${storeName}`, JSON.stringify(list));
+          return;
+        }
+        return new Promise((resolve) => {
+          const tx = this.db.transaction(storeName, 'readwrite');
+          tx.objectStore(storeName).put(value);
+          tx.oncomplete = () => resolve();
+          tx.onerror = () => resolve();
+        });
+      }
+    };
+
+    async function hashPassword(plain) {
+      try {
+        if (window.crypto && window.crypto.subtle) {
+          const buf = new TextEncoder().encode('green_finance_salt_' + plain);
+          const digest = await crypto.subtle.digest('SHA-256', buf);
+          return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+      } catch (_) {}
+      let h = 0;
+      for (let i = 0; i < plain.length; i++) h = ((h << 5) - h) + plain.charCodeAt(i) | 0;
+      return 'gf_' + Math.abs(h).toString(16);
+    }
+
+    function createCleanWorkspace(username) {
+      return {
+        username,
+        lastSavedAt: new Date().toISOString(),
+        budgets: [
+          { id: 'b_food', name: 'อาหารและเครื่องดื่ม', limit: 6000 },
+          { id: 'b_util', name: 'ค่าน้ำ-ค่าไฟ-เน็ต', limit: 3000 },
+          { id: 'b_home', name: 'ของใช้ในบ้าน', limit: 3000 },
+          { id: 'b_save', name: 'เงินออม', limit: 5000 }
+        ],
+        transactions: [],
+        shoppingItems: [],
+        calEvents: {},
+        dayMoods: {},
+        pets: []
+      };
+    }
+
+    // ===========================================================
+    // 4. APPLICATION STATE
+    // ===========================================================
+    const bootToday = getTodayDateParts();
+
+    let appState = {
+      currentUser: null,
+      workspace: null,
+      customShareUrl: '',
+      activeTab: 'finance',
+      heroMetricMode: 'expense',
+      txFilter: 'all',
+      modalTxType: 'expense',
+
+      finYear: Math.min(Math.max(bootToday.year, MIN_YEAR), MAX_YEAR),
+      finMonth: bootToday.month,
+
+      shoppingFilter: 'ทั้งหมด',
+
+      calSubTab: 'month',
+      calScopeFilter: 'Shared',
+      calYear: Math.min(Math.max(bootToday.year, MIN_YEAR), MAX_YEAR),
+      calMonth: bootToday.month,
+      calSelectedISO: bootToday.iso
+    };
+
+    let selectedRegColor = '#15803D';
+    let selectedRegWalletMode = 'solo';
+    let selectedPetEmoji = '🐶';
+    let pendingConfirmAction = null;
+
+    async function saveWorkspaceToDevice() {
+      if (!appState.currentUser || !appState.workspace) return;
+      appState.workspace.lastSavedAt = new Date().toISOString();
+      await LocalDB.put('workspaces', appState.workspace);
+      await LocalDB.put('users', appState.currentUser);
+      updateDatabaseStatsUI();
+    }
+
+    // ===========================================================
+    // 5. SHARED HELPERS (FORMAT, TOAST, CONFIRM, CLIPBOARD)
+    // ===========================================================
+    function formatBaht(num) {
+      const n = Number(num) || 0;
+      return n.toLocaleString('en-US', {
+        minimumFractionDigits: n % 1 === 0 ? 0 : 2,
+        maximumFractionDigits: 2
+      });
+    }
+
+    function escapeHTML(str) {
+      return String(str || '').replace(/[&<>"']/g, m => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[m]));
+    }
+
+    let toastTimer = null;
+    function showToast(msg) {
+      const toast = document.getElementById('toast-banner');
+      toast.textContent = msg;
+      toast.classList.remove('opacity-0');
+      toast.classList.add('opacity-100');
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.remove('opacity-100');
+        toast.classList.add('opacity-0');
+      }, 2500);
+    }
+
+    function openConfirmModal(title, message, confirmLabel, onConfirm) {
+      document.getElementById('confirm-modal-title').textContent = title;
+      document.getElementById('confirm-modal-msg').textContent = message;
+      const btn = document.getElementById('confirm-modal-action-btn');
+      btn.textContent = confirmLabel || 'ยืนยัน';
+      pendingConfirmAction = onConfirm;
+      btn.onclick = () => {
+        const fn = pendingConfirmAction;
+        closeConfirmModal();
+        if (fn) fn();
+      };
+      document.getElementById('confirm-modal').classList.remove('hidden');
+    }
+
+    function closeConfirmModal() {
+      pendingConfirmAction = null;
+      document.getElementById('confirm-modal').classList.add('hidden');
+    }
+
+    function copyTextSafe(text, successMsg) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      try {
+        document.execCommand('copy');
+        showToast(successMsg || 'คัดลอกเรียบร้อยแล้ว');
+      } catch (_) {
+        showToast('ไม่สามารถคัดลอกได้ กรุณาคัดลอกด้วยตนเอง');
+      }
+      document.body.removeChild(ta);
+    }
+
+    // ===========================================================
+    // 6. AUTHENTICATION (SOLO / SHARED REGISTER, LOGIN, LOGOUT)
+    // ===========================================================
+    function togglePasswordVisibility(inputId, btnEl) {
+      const input = document.getElementById(inputId);
+      const icon = btnEl.querySelector('i');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'fa-regular fa-eye-slash';
+      } else {
+        input.type = 'password';
+        icon.className = 'fa-regular fa-eye';
+      }
+    }
+
+    function setRegisterWalletMode(mode) {
+      selectedRegWalletMode = mode;
+      const soloBtn = document.getElementById('reg-mode-solo');
+      const sharedBtn = document.getElementById('reg-mode-shared');
+      const partnerBox = document.getElementById('reg-partner-box');
+      const partnerInput = document.getElementById('reg-partner');
+
+      if (mode === 'solo') {
+        soloBtn.className = 'py-2.5 px-3 rounded-2xl text-xs font-bold border bg-[#ECFDF5] border-[#15803D] text-[#166534] flex items-center justify-center gap-1.5 transition';
+        sharedBtn.className = 'py-2.5 px-3 rounded-2xl text-xs font-bold border bg-[#F4F8F5] border-[#D8E5DC] text-stone-600 flex items-center justify-center gap-1.5 transition';
+        partnerBox.classList.add('hidden');
+        partnerInput.required = false;
+        partnerInput.value = '';
+      } else {
+        sharedBtn.className = 'py-2.5 px-3 rounded-2xl text-xs font-bold border bg-[#ECFDF5] border-[#15803D] text-[#166534] flex items-center justify-center gap-1.5 transition';
+        soloBtn.className = 'py-2.5 px-3 rounded-2xl text-xs font-bold border bg-[#F4F8F5] border-[#D8E5DC] text-stone-600 flex items-center justify-center gap-1.5 transition';
+        partnerBox.classList.remove('hidden');
+        partnerInput.required = true;
+      }
+    }
+
+    function switchAuthMode(mode) {
+      const loginForm = document.getElementById('login-form');
+      const regForm = document.getElementById('register-form');
+      const loginBtn = document.getElementById('tab-login-btn');
+      const regBtn = document.getElementById('tab-register-btn');
+      hideAuthMessage();
+
+      if (mode === 'login') {
+        loginForm.classList.remove('hidden');
+        regForm.classList.add('hidden');
+        loginBtn.className = 'flex-1 py-2.5 text-xs font-bold rounded-xl bg-white text-[#166534] shadow-xs transition-all';
+        regBtn.className = 'flex-1 py-2.5 text-xs font-bold rounded-xl text-stone-600 hover:text-stone-900 transition-all';
+      } else {
+        loginForm.classList.add('hidden');
+        regForm.classList.remove('hidden');
+        regBtn.className = 'flex-1 py-2.5 text-xs font-bold rounded-xl bg-white text-[#166534] shadow-xs transition-all';
+        loginBtn.className = 'flex-1 py-2.5 text-xs font-bold rounded-xl text-stone-600 hover:text-stone-900 transition-all';
+      }
+    }
+
+    function selectRegColor(color) {
+      selectedRegColor = color;
+      document.querySelectorAll('#reg-color-picker button').forEach(btn => {
+        if (btn.dataset.color === color) {
+          btn.className = 'w-7 h-7 rounded-full ring-2 ring-offset-2';
+          btn.style.backgroundColor = color;
+        } else {
+          btn.className = 'w-7 h-7 rounded-full opacity-60';
+          btn.style.backgroundColor = btn.dataset.color;
+        }
+      });
+    }
+
+    function showAuthMessage(msg, isError = true) {
+      const el = document.getElementById('auth-message');
+      el.textContent = msg;
+      el.classList.remove('hidden');
+      el.className = isError
+        ? 'mb-4 px-4 py-3 rounded-2xl text-xs font-bold bg-red-50 text-red-700 border border-red-200'
+        : 'mb-4 px-4 py-3 rounded-2xl text-xs font-bold bg-[#DCFCE7] text-[#166534] border border-emerald-300';
+    }
+
+    function hideAuthMessage() {
+      document.getElementById('auth-message').classList.add('hidden');
+    }
+
+    async function refreshAuthOnboardingState() {
+      const users = await LocalDB.getAll('users');
+      const hint = document.getElementById('first-time-hint');
+      const savedBar = document.getElementById('saved-accounts-bar');
+      const chipsWrap = document.getElementById('saved-accounts-chips');
+
+      if (users.length === 0) {
+        hint.classList.remove('hidden');
+        savedBar.classList.add('hidden');
+      } else {
+        hint.classList.add('hidden');
+        savedBar.classList.remove('hidden');
+        chipsWrap.innerHTML = users.map(u => `
+          <button type="button" onclick="prefillLoginAccount('${escapeHTML(u.username)}')"
+            class="px-3 py-1.5 rounded-full bg-white border border-[#D8E5DC] hover:border-[#15803D] text-xs font-bold text-stone-700 flex items-center gap-1.5 transition">
+            <span class="w-4 h-4 rounded-full text-white text-[9px] flex items-center justify-center" style="background-color:${u.badgeColor || '#15803D'}">
+              ${escapeHTML((u.displayName || 'U').charAt(0).toUpperCase())}
+            </span>
+            <span>${escapeHTML(u.displayName)}</span>
+          </button>
+        `).join('');
+      }
+    }
+
+    function prefillLoginAccount(username) {
+      switchAuthMode('login');
+      document.getElementById('login-username').value = username;
+      document.getElementById('login-password').focus();
+    }
+
+    async function handleRegister(e) {
+      e.preventDefault();
+      const displayName = document.getElementById('reg-displayname').value.trim();
+      const username = document.getElementById('reg-username').value.trim().toLowerCase();
+      const password = document.getElementById('reg-password').value;
+      const partnerName = selectedRegWalletMode === 'shared'
+        ? document.getElementById('reg-partner').value.trim()
+        : '';
+
+      if (!username || !displayName || password.length < 4) {
+        showAuthMessage('กรุณากรอกข้อมูลให้ครบ และตั้งรหัสผ่านอย่างน้อย 4 ตัวอักษร');
+        return;
+      }
+      if (selectedRegWalletMode === 'shared' && !partnerName) {
+        showAuthMessage('กรุณาระบุชื่อคู่หูสำหรับกระเป๋าร่วม หรือเลือกโหมดใช้งานคนเดียว');
+        return;
+      }
+
+      const existing = await LocalDB.get('users', username);
+      if (existing) {
+        showAuthMessage('Username นี้มีอยู่ในเครื่องแล้ว กรุณาเข้าสู่ระบบหรือใช้ชื่ออื่น');
+        return;
+      }
+
+      const passwordHash = await hashPassword(password);
+      const newUser = {
+        username,
+        displayName,
+        partnerName,
+        badgeColor: selectedRegColor,
+        activePayer: displayName,
+        passwordHash,
+        createdAt: new Date().toISOString()
+      };
+
+      const cleanWS = createCleanWorkspace(username);
+      await LocalDB.put('users', newUser);
+      await LocalDB.put('workspaces', cleanWS);
+      await LocalDB.put('meta', { key: 'activeSession', username });
+
+      appState.currentUser = newUser;
+      appState.workspace = cleanWS;
+      appState.calScopeFilter = partnerName ? 'Shared' : 'Personal';
+
+      document.getElementById('register-form').reset();
+      setRegisterWalletMode('solo');
+      syncDateFiltersToRealTime();
+      renderApp();
+      showToast(`สร้างบัญชี ${displayName} สำเร็จ`);
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const username = document.getElementById('login-username').value.trim().toLowerCase();
+      const password = document.getElementById('login-password').value;
+
+      const user = await LocalDB.get('users', username);
+      if (!user) {
+        showAuthMessage('ไม่พบบัญชีนี้ในเครื่อง กรุณาสมัครสมาชิกใหม่ก่อนเข้าใช้งาน');
+        return;
+      }
+
+      const inputHash = await hashPassword(password);
+      if (user.passwordHash !== inputHash) {
+        showAuthMessage('รหัสผ่าน หรือ PIN ไม่ถูกต้อง');
+        return;
+      }
+
+      let ws = await LocalDB.get('workspaces', username);
+      if (!ws) {
+        ws = createCleanWorkspace(username);
+        await LocalDB.put('workspaces', ws);
+      }
+
+      await LocalDB.put('meta', { key: 'activeSession', username });
+      appState.currentUser = user;
+      appState.workspace = ws;
+      appState.calScopeFilter = user.partnerName ? 'Shared' : 'Personal';
+
+      document.getElementById('login-password').value = '';
+      hideAuthMessage();
+      syncDateFiltersToRealTime();
+      renderApp();
+      showToast(`เข้าสู่ระบบสำเร็จ (${user.displayName})`);
+    }
+
+    async function handleLogout() {
+      await LocalDB.put('meta', { key: 'activeSession', username: null });
+      appState.currentUser = null;
+      appState.workspace = null;
+      await refreshAuthOnboardingState();
+      switchAuthMode('login');
+      renderApp();
+      showToast('ออกจากระบบเรียบร้อยแล้ว');
+    }
+
+    async function toggleActivePayer() {
+      const u = appState.currentUser;
+      if (!u || !u.partnerName) {
+        openEditProfileModal();
+        return;
+      }
+      u.activePayer = u.activePayer === u.displayName ? u.partnerName : u.displayName;
+      await saveWorkspaceToDevice();
+      renderApp();
+      showToast(`สลับผู้จ่ายเป็น ${u.activePayer}`);
+    }
+
+    function syncDateFiltersToRealTime() {
+      const today = getTodayDateParts();
+      const clampedYear = Math.min(Math.max(today.year, MIN_YEAR), MAX_YEAR);
+      appState.finYear = clampedYear;
+      appState.finMonth = today.month;
+      appState.calYear = clampedYear;
+      appState.calMonth = today.month;
+      appState.calSelectedISO = today.iso;
+    }
+
+    // ===========================================================
+    // 7. MONTH & YEAR DROPDOWNS (2024 - 2032) & TAB SWITCHER
+    // ===========================================================
+    function initMonthYearSelects() {
+      ['fin-month-select', 'cal-month-select'].forEach(id => {
+        document.getElementById(id).innerHTML = THAI_MONTHS.map((m, idx) => `<option value="${idx}">${m}</option>`).join('');
+      });
+
+      let yearHTML = '';
+      for (let y = MIN_YEAR; y <= MAX_YEAR; y++) {
+        yearHTML += `<option value="${y}">${y}</option>`;
+      }
+      ['fin-year-select', 'cal-year-select'].forEach(id => {
+        document.getElementById(id).innerHTML = yearHTML;
+      });
+    }
+
+    function switchTab(tabName) {
+      appState.activeTab = tabName;
+      ['home', 'shopping', 'calendar', 'pet', 'finance', 'profile'].forEach(t => {
+        const viewEl = document.getElementById(`view-${t}`);
+        const navEl = document.getElementById(`nav-${t}`);
+        if (t === tabName) {
+          viewEl.classList.remove('hidden');
+          navEl.className = 'relative flex flex-col items-center gap-1 py-1 px-2 text-[#15803D] transition';
+        } else {
+          viewEl.classList.add('hidden');
+          navEl.className = 'relative flex flex-col items-center gap-1 py-1 px-2 text-stone-400 hover:text-stone-600 transition';
+        }
+      });
+      document.getElementById('tab-content-scroll').scrollTop = 0;
+      renderApp();
+    }
+
+    // ===========================================================
+    // 8. FINANCE TAB (HERO CARD, BUDGETS, TRANSACTIONS)
+    // ===========================================================
+    function changeFinanceMonth(delta) {
+      let m = appState.finMonth + delta;
+      let y = appState.finYear;
+      if (m < 0) { m = 11; y--; }
+      if (m > 11) { m = 0; y++; }
+      if (y < MIN_YEAR) { y = MIN_YEAR; m = 0; }
+      if (y > MAX_YEAR) { y = MAX_YEAR; m = 11; }
+      appState.finMonth = m;
+      appState.finYear = y;
+      renderFinance();
+    }
+
+    function handleFinanceMonthSelect() {
+      appState.finMonth = parseInt(document.getElementById('fin-month-select').value, 10);
+      appState.finYear = parseInt(document.getElementById('fin-year-select').value, 10);
+      renderFinance();
+    }
+
+    function jumpFinanceToCurrentMonth() {
+      const today = getTodayDateParts();
+      appState.finYear = Math.min(Math.max(today.year, MIN_YEAR), MAX_YEAR);
+      appState.finMonth = today.month;
+      renderFinance();
+      showToast(`แสดงข้อมูลเดือน ${THAI_MONTHS[appState.finMonth]} ${appState.finYear}`);
+    }
+
+    function setHeroMetricMode(mode) {
+      appState.heroMetricMode = mode;
+      renderFinance();
+    }
+
+    function filterTransactions(f) {
+      appState.txFilter = f;
+      renderFinance();
+    }
+
+    function getTransactionsForMonth(year, month) {
+      const prefix = `${year}-${String(month + 1).padStart(2, '0')}`;
+      return (appState.workspace?.transactions || []).filter(t => (t.date || '').startsWith(prefix));
+    }
+
+    function renderFinance() {
+      if (!appState.currentUser || !appState.workspace) return;
+
+      document.getElementById('fin-month-select').value = String(appState.finMonth);
+      document.getElementById('fin-year-select').value = String(appState.finYear);
+
+      const u = appState.currentUser;
+      const hasPartner = Boolean(u.partnerName && u.partnerName.trim());
+      const monthName = THAI_MONTHS[appState.finMonth];
+      document.getElementById('finance-subtitle').textContent =
+        `${monthName} ${appState.finYear} · ${hasPartner ? `กระเป๋าร่วม (${u.displayName} & ${u.partnerName})` : 'กระเป๋าส่วนตัว'}`;
+
+      const monthTxs = getTransactionsForMonth(appState.finYear, appState.finMonth);
+      const expenses = monthTxs.filter(t => t.type === 'expense');
+      const incomes = monthTxs.filter(t => t.type === 'income');
+
+      const totalSpending = expenses.reduce((s, t) => s + Number(t.amount), 0);
+      const totalIncome = incomes.reduce((s, t) => s + Number(t.amount), 0);
+      const netBalance = totalIncome - totalSpending;
+
+      ['expense', 'income', 'net'].forEach(m => {
+        const btn = document.getElementById(`hero-mode-${m}`);
+        btn.className = appState.heroMetricMode === m
+          ? 'px-2.5 py-1 rounded-full bg-white text-[#166534] shadow-2xs transition'
+          : 'px-2.5 py-1 rounded-full text-white/80 hover:text-white transition';
+      });
+
+      const labelEl = document.getElementById('hero-metric-label');
+      const amountEl = document.getElementById('hero-main-amount');
+      const badgeEl = document.getElementById('hero-secondary-badge');
+
+      if (appState.heroMetricMode === 'expense') {
+        labelEl.textContent = `รายจ่ายเดือนนี้ · ${monthName} ${appState.finYear}`;
+        amountEl.textContent = `฿ ${formatBaht(totalSpending)}`;
+        badgeEl.textContent = `รายรับ +฿ ${formatBaht(totalIncome)}`;
+      } else if (appState.heroMetricMode === 'income') {
+        labelEl.textContent = `รายรับเดือนนี้ · ${monthName} ${appState.finYear}`;
+        amountEl.textContent = `+฿ ${formatBaht(totalIncome)}`;
+        badgeEl.textContent = `รายจ่าย ฿ ${formatBaht(totalSpending)}`;
+      } else {
+        labelEl.textContent = `คงเหลือสุทธิ · ${monthName} ${appState.finYear}`;
+        amountEl.textContent = `${netBalance >= 0 ? '฿ ' : '-฿ '}${formatBaht(Math.abs(netBalance))}`;
+        badgeEl.textContent = `รับ ฿${formatBaht(totalIncome)} · จ่าย ฿${formatBaht(totalSpending)}`;
+      }
+
+      const barsEl = document.getElementById('hero-breakdown-bars');
+      const glassEl = document.getElementById('hero-glass-cards');
+
+      if (hasPartner) {
+        const u1Paid = expenses.filter(t => t.payer === u.displayName).reduce((s, t) => s + Number(t.amount), 0);
+        const u2Paid = expenses.filter(t => t.payer === u.partnerName).reduce((s, t) => s + Number(t.amount), 0);
+        const denom = Math.max(u1Paid + u2Paid, 1);
+
+        const u1Pending = expenses.filter(t => t.payer === u.displayName && t.status === 'pending');
+        const u2Pending = expenses.filter(t => t.payer === u.partnerName && t.status === 'pending');
+        const u1PendSum = u1Pending.reduce((s, t) => s + Number(t.amount), 0);
+        const u2PendSum = u2Pending.reduce((s, t) => s + Number(t.amount), 0);
+
+        barsEl.innerHTML = `
+          <div>
+            <p class="text-xs text-emerald-100/85 font-medium truncate">${escapeHTML(u.displayName)} Paid</p>
+            <p class="text-lg font-extrabold mt-0.5 tabular-nums">฿ ${formatBaht(u1Paid)}</p>
+            <div class="w-full h-1.5 bg-white/20 rounded-full mt-2 overflow-hidden">
+              <div class="h-full bg-white rounded-full transition-all duration-300" style="width: ${u1Paid > 0 ? Math.round((u1Paid / denom) * 100) : 0}%"></div>
+            </div>
+          </div>
+          <div>
+            <p class="text-xs text-emerald-100/85 font-medium truncate">${escapeHTML(u.partnerName)} Paid</p>
+            <p class="text-lg font-extrabold mt-0.5 tabular-nums">฿ ${formatBaht(u2Paid)}</p>
+            <div class="w-full h-1.5 bg-white/20 rounded-full mt-2 overflow-hidden">
+              <div class="h-full bg-emerald-200 rounded-full transition-all duration-300" style="width: ${u2Paid > 0 ? Math.round((u2Paid / denom) * 100) : 0}%"></div>
+            </div>
+          </div>
+        `;
+
+        glassEl.innerHTML = `
+          <div onclick="filterTransactions('pending')" class="glass-subcard rounded-[20px] p-3.5 cursor-pointer hover:bg-white/20 transition">
+            <div class="flex items-center gap-1.5 text-emerald-50 text-xs font-medium truncate">
+              <i class="fa-regular fa-clock text-[11px]"></i>
+              <span class="truncate">${escapeHTML(u.displayName)} รอเคลียร์ยอด</span>
+            </div>
+            <p class="text-lg font-extrabold mt-1 tabular-nums">฿ ${formatBaht(u1PendSum)}</p>
+            <p class="text-[11px] text-emerald-100/75 mt-0.5">${u1Pending.length} รายการรอเคลียร์</p>
+          </div>
+          <div onclick="filterTransactions('pending')" class="glass-subcard rounded-[20px] p-3.5 cursor-pointer hover:bg-white/20 transition">
+            <div class="flex items-center gap-1.5 text-emerald-50 text-xs font-medium truncate">
+              <i class="fa-regular fa-clock text-[11px]"></i>
+              <span class="truncate">${escapeHTML(u.partnerName)} รอเคลียร์ยอด</span>
+            </div>
+            <p class="text-lg font-extrabold mt-1 tabular-nums">฿ ${formatBaht(u2PendSum)}</p>
+            <p class="text-[11px] text-emerald-100/75 mt-0.5">${u2Pending.length} รายการรอเคลียร์</p>
+          </div>
+        `;
+      } else {
+        const flowDenom = Math.max(totalIncome + totalSpending, 1);
+        const settledExp = expenses.filter(t => t.status === 'settled').reduce((s, t) => s + Number(t.amount), 0);
+        const pendingExpItems = expenses.filter(t => t.status === 'pending');
+        const pendingExpSum = pendingExpItems.reduce((s, t) => s + Number(t.amount), 0);
+
+        barsEl.innerHTML = `
+          <div>
+            <p class="text-xs text-emerald-100/85 font-medium">รายรับเดือนนี้</p>
+            <p class="text-lg font-extrabold mt-0.5 text-emerald-200 tabular-nums">+฿ ${formatBaht(totalIncome)}</p>
+            <div class="w-full h-1.5 bg-white/20 rounded-full mt-2 overflow-hidden">
+              <div class="h-full bg-emerald-300 rounded-full transition-all duration-300" style="width: ${totalIncome > 0 ? Math.round((totalIncome / flowDenom) * 100) : 0}%"></div>
+            </div>
+          </div>
+          <div>
+            <p class="text-xs text-emerald-100/85 font-medium">รายจ่ายเดือนนี้</p>
+            <p class="text-lg font-extrabold mt-0.5 tabular-nums">฿ ${formatBaht(totalSpending)}</p>
+            <div class="w-full h-1.5 bg-white/20 rounded-full mt-2 overflow-hidden">
+              <div class="h-full bg-white rounded-full transition-all duration-300" style="width: ${totalSpending > 0 ? Math.round((totalSpending / flowDenom) * 100) : 0}%"></div>
+            </div>
+          </div>
+        `;
+
+        glassEl.innerHTML = `
+          <div class="glass-subcard rounded-[20px] p-3.5">
+            <div class="flex items-center gap-1.5 text-emerald-50 text-xs font-medium">
+              <i class="fa-solid fa-circle-check text-[11px]"></i>
+              <span>เคลียร์ยอดแล้ว</span>
+            </div>
+            <p class="text-lg font-extrabold mt-1 tabular-nums">฿ ${formatBaht(settledExp)}</p>
+            <p class="text-[11px] text-emerald-100/75 mt-0.5">จ่ายสำเร็จ</p>
+          </div>
+          <div onclick="filterTransactions('pending')" class="glass-subcard rounded-[20px] p-3.5 cursor-pointer hover:bg-white/20 transition">
+            <div class="flex items-center gap-1.5 text-emerald-50 text-xs font-medium">
+              <i class="fa-regular fa-clock text-[11px]"></i>
+              <span>รอเคลียร์ยอด</span>
+            </div>
+            <p class="text-lg font-extrabold mt-1 tabular-nums">฿ ${formatBaht(pendingExpSum)}</p>
+            <p class="text-[11px] text-emerald-100/75 mt-0.5">${pendingExpItems.length} รายการ</p>
+          </div>
+        `;
+      }
+
+      // Monthly Budgets
+      const budgets = appState.workspace.budgets || [];
+      const budgetCard = document.getElementById('budget-list-card');
+      if (budgets.length === 0) {
+        budgetCard.innerHTML = `<div class="text-center py-4 text-xs text-stone-400">ยังไม่มีหมวดหมู่งบประมาณ กด "+ เพิ่มหมวดหมู่" เพื่อตั้งงบรายเดือน</div>`;
+      } else {
+        budgetCard.innerHTML = budgets.map(b => {
+          const spent = expenses
+            .filter(t => t.category.toLowerCase() === b.name.toLowerCase())
+            .reduce((s, t) => s + Number(t.amount), 0);
+          const pct = b.limit > 0 ? Math.min(100, Math.round((spent / b.limit) * 100)) : 0;
+          const isOver = spent > b.limit;
+          const meta = CATEGORY_META[b.name] || { icon: 'fa-solid fa-tag' };
+
+          return `
+            <div class="space-y-2">
+              <div class="flex items-center justify-between text-sm">
+                <div class="flex items-center gap-2.5 min-w-0">
+                  <i class="${meta.icon} text-[#15803D] w-4 text-center text-xs"></i>
+                  <span class="font-bold text-stone-800 truncate">${escapeHTML(b.name)}</span>
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                  <div class="text-xs font-bold tabular-nums">
+                    <span class="${isOver ? 'text-orange-600' : spent > 0 ? 'text-[#15803D]' : 'text-stone-700'}">฿${formatBaht(spent)}</span>
+                    <span class="text-stone-400 font-medium"> / ฿${formatBaht(b.limit)}</span>
+                  </div>
+                  <button onclick="deleteBudgetCategory('${b.id}')" title="ลบหมวดหมู่" class="text-stone-300 hover:text-red-500 text-[11px] transition">
+                    <i class="fa-solid fa-xmark"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="w-full h-2 rounded-full bg-[#E9F1EC] overflow-hidden">
+                <div class="h-full rounded-full transition-all duration-300 ${isOver ? 'bg-orange-500' : 'bg-[#15803D]'}"
+                  style="width: ${spent > 0 ? Math.max(pct, 6) : 0}%"></div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      ['all', 'expense', 'income', 'pending'].forEach(f => {
+        const el = document.getElementById(`tx-filter-${f}`);
+        el.className = appState.txFilter === f
+          ? 'px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#15803D] text-white shrink-0 transition'
+          : 'px-3.5 py-1.5 rounded-full text-xs font-bold bg-white text-stone-600 border border-[#D8E5DC] shrink-0 transition';
+      });
+
+      let filteredTx = [...monthTxs];
+      if (appState.txFilter === 'expense') filteredTx = filteredTx.filter(t => t.type === 'expense');
+      if (appState.txFilter === 'income') filteredTx = filteredTx.filter(t => t.type === 'income');
+      if (appState.txFilter === 'pending') filteredTx = filteredTx.filter(t => t.status === 'pending');
+
+      const txContainer = document.getElementById('transactions-list-container');
+      if (filteredTx.length === 0) {
+        txContainer.innerHTML = `
+          <div class="py-10 text-center space-y-2.5">
+            <div class="w-12 h-12 rounded-2xl bg-[#ECFDF5] text-[#15803D] mx-auto flex items-center justify-center">
+              <i class="fa-solid fa-seedling text-lg"></i>
+            </div>
+            <p class="text-xs font-bold text-stone-600">ยังไม่มีรายการในเดือน ${monthName} ${appState.finYear}</p>
+            <p class="text-[11px] text-stone-400">กดปุ่ม "+ บันทึกรายการ" เพื่อเริ่มจดรายรับ-รายจ่าย</p>
+          </div>
+        `;
+      } else {
+        txContainer.innerHTML = filteredTx.map(tx => renderTransactionRowHTML(tx, false)).join('');
+      }
+
+      renderHomeDashboard();
+    }
+
+    function renderHomeDashboard() {
+      if (!appState.currentUser || !appState.workspace) return;
+      const today = getTodayDateParts();
+      const currentMonthTxs = getTransactionsForMonth(today.year, today.month);
+      const inc = currentMonthTxs.filter(t => t.type === 'income').reduce((s, t) => s + Number(t.amount), 0);
+      const exp = currentMonthTxs.filter(t => t.type === 'expense').reduce((s, t) => s + Number(t.amount), 0);
+      const net = inc - exp;
+
+      document.getElementById('home-month-label').textContent = `ภาพรวมเดือน ${THAI_MONTHS[today.month]} ${today.year}`;
+      document.getElementById('home-total-income').textContent = `+฿ ${formatBaht(inc)}`;
+      document.getElementById('home-total-expense').textContent = `฿ ${formatBaht(exp)}`;
+      document.getElementById('home-net-balance').textContent = `${net >= 0 ? '฿ ' : '-฿ '}${formatBaht(Math.abs(net))}`;
+
+      const recent = (appState.workspace.transactions || []).slice(0, 4);
+      const homeTxEl = document.getElementById('home-recent-tx');
+      if (recent.length === 0) {
+        homeTxEl.innerHTML = `<div class="py-6 text-center text-xs text-stone-400">ยังไม่มีรายการล่าสุด เริ่มต้นจดบันทึกได้เลย</div>`;
+      } else {
+        homeTxEl.innerHTML = recent.map(tx => renderTransactionRowHTML(tx, true)).join('');
+      }
+
+      const todayMood = appState.workspace.dayMoods?.[today.iso];
+      const moodStatusEl = document.getElementById('home-mood-status');
+      const moodWrap = document.getElementById('home-mood-icon-wrap');
+      if (todayMood && MOOD_META[todayMood]) {
+        const m = MOOD_META[todayMood];
+        moodStatusEl.textContent = `วันนี้: ${m.label} (${m.thLabel})`;
+        moodWrap.style.backgroundColor = m.color;
+        moodWrap.innerHTML = m.svg;
+      } else {
+        moodStatusEl.textContent = 'แตะเพื่อบันทึกอารมณ์วันนี้';
+        moodWrap.style.backgroundColor = '#ECFDF5';
+        moodWrap.innerHTML = `<i class="fa-regular fa-face-smile text-[#15803D]"></i>`;
+      }
+    }
+
+    function renderTransactionRowHTML(tx, compact) {
+      const meta = CATEGORY_META[tx.category] || { bg: '#E9F3EC', color: '#15803D', icon: 'fa-solid fa-tag' };
+      const isIncome = tx.type === 'income';
+      const isSettled = tx.status === 'settled';
+      const payerInitial = (tx.payer || 'U').charAt(0).toUpperCase();
+      const isPrimaryUser = tx.payer === appState.currentUser?.displayName;
+      const badgeColor = isPrimaryUser ? (appState.currentUser?.badgeColor || '#15803D') : '#334155';
+
+      return `
+        <div class="py-3.5 flex items-center justify-between gap-3">
+          <div class="flex items-center gap-3.5 min-w-0">
+            <div class="w-11 h-11 rounded-[15px] flex items-center justify-center shrink-0"
+              style="background-color: ${isIncome ? '#DCFCE7' : meta.bg}; color: ${isIncome ? '#15803D' : meta.color}">
+              <i class="${isIncome ? 'fa-solid fa-arrow-trend-up' : meta.icon} text-base"></i>
+            </div>
+
+            <div class="min-w-0">
+              <div class="flex items-center gap-1.5">
+                <h4 class="text-sm font-bold text-stone-900 truncate">${escapeHTML(tx.title)}</h4>
+                ${isIncome ? '<span class="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-[#DCFCE7] text-[#166534]">รายรับ</span>' : ''}
+              </div>
+              <div class="flex items-center gap-1.5 mt-1 text-[11px] text-stone-400 font-medium">
+                <span class="w-4 h-4 rounded-full text-white text-[9px] font-extrabold flex items-center justify-center shrink-0" style="background-color: ${badgeColor}">
+                  ${escapeHTML(payerInitial)}
+                </span>
+                <span class="text-stone-600 truncate max-w-[90px]">${escapeHTML(tx.payer)}</span>
+                <span>·</span>
+                <span>${formatDisplayDate(tx.date)}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-col items-end gap-1.5 shrink-0">
+            <div class="text-[15px] font-extrabold tabular-nums ${isIncome ? 'text-[#15803D]' : 'text-stone-900'}">
+              ${isIncome ? '+฿ ' : '฿ '}${formatBaht(tx.amount)}
+            </div>
+            <div class="flex items-center gap-1.5">
+              ${!compact ? `
+                <button onclick="openEditTransaction('${tx.id}')" title="แก้ไขรายการ" class="w-6 h-6 rounded-lg text-stone-300 hover:text-[#15803D] text-xs transition">
+                  <i class="fa-regular fa-pen-to-square"></i>
+                </button>
+                <button onclick="deleteTransaction('${tx.id}')" title="ลบรายการ" class="w-6 h-6 rounded-lg text-stone-300 hover:text-red-500 text-xs transition">
+                  <i class="fa-regular fa-trash-can"></i>
+                </button>
+              ` : ''}
+              <button onclick="toggleTransactionStatus('${tx.id}')" title="สลับสถานะ เคลียร์แล้ว / รอเคลียร์ยอด"
+                class="w-7 h-7 rounded-[9px] flex items-center justify-center transition active:scale-90 ${
+                  isSettled
+                    ? 'bg-[#10B981] text-white shadow-2xs'
+                    : 'bg-amber-50 text-amber-600 border border-amber-300'
+                }">
+                <i class="${isSettled ? 'fa-solid fa-check text-xs' : 'fa-regular fa-clock text-xs'}"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // ===========================================================
+    // 9. TRANSACTION & BUDGET ACTIONS
+    // ===========================================================
+    function populateTxModalSelects() {
+      const catSelect = document.getElementById('tx-category-input');
+      const budgetNames = (appState.workspace?.budgets || []).map(b => b.name);
+      const allCats = Array.from(new Set([...budgetNames, ...Object.keys(CATEGORY_META)]));
+      catSelect.innerHTML = allCats.map(c => `<option value="${escapeHTML(c)}">${escapeHTML(c)}</option>`).join('');
+
+      const payerSelect = document.getElementById('tx-payer-input');
+      const u = appState.currentUser;
+      const payers = [u.displayName];
+      if (u.partnerName && u.partnerName.trim()) payers.push(u.partnerName.trim());
+      payerSelect.innerHTML = payers.map(p => `<option value="${escapeHTML(p)}">${escapeHTML(p)}</option>`).join('');
+      payerSelect.value = u.activePayer || u.displayName;
+    }
+
+    function openTransactionModal(defaultType = 'expense') {
+      populateTxModalSelects();
+      document.getElementById('tx-edit-id').value = '';
+      document.getElementById('tx-modal-heading').textContent = 'บันทึกรายการใหม่';
+      document.getElementById('tx-title-input').value = '';
+      document.getElementById('tx-amount-input').value = '';
+      document.getElementById('tx-date-input').value = getTodayDateParts().iso;
+      document.querySelector('input[name="tx-status"][value="settled"]').checked = true;
+      setModalTxType(defaultType);
+      document.getElementById('tx-modal').classList.remove('hidden');
+    }
+
+    function openEditTransaction(txId) {
+      const tx = (appState.workspace?.transactions || []).find(t => t.id === txId);
+      if (!tx) return;
+      populateTxModalSelects();
+      document.getElementById('tx-edit-id').value = tx.id;
+      document.getElementById('tx-modal-heading').textContent = 'แก้ไขรายการ';
+      setModalTxType(tx.type);
+      document.getElementById('tx-title-input').value = tx.title;
+      document.getElementById('tx-amount-input').value = tx.amount;
+      document.getElementById('tx-date-input').value = tx.date;
+      document.getElementById('tx-category-input').value = tx.category;
+      document.getElementById('tx-payer-input').value = tx.payer;
+      const radio = document.querySelector(`input[name="tx-status"][value="${tx.status}"]`);
+      if (radio) radio.checked = true;
+      document.getElementById('tx-modal').classList.remove('hidden');
+    }
+
+    function closeTransactionModal() {
+      document.getElementById('tx-modal').classList.add('hidden');
+    }
+
+    function setModalTxType(type) {
+      appState.modalTxType = type;
+      const expBtn = document.getElementById('modal-type-expense');
+      const incBtn = document.getElementById('modal-type-income');
+      const catSelect = document.getElementById('tx-category-input');
+
+      if (type === 'expense') {
+        expBtn.className = 'py-2.5 rounded-xl text-xs font-extrabold bg-[#15803D] text-white shadow-xs transition';
+        incBtn.className = 'py-2.5 rounded-xl text-xs font-extrabold text-stone-600 transition';
+        if (catSelect.value === 'เงินเดือน / รายรับ') catSelect.selectedIndex = 0;
+      } else {
+        incBtn.className = 'py-2.5 rounded-xl text-xs font-extrabold bg-[#059669] text-white shadow-xs transition';
+        expBtn.className = 'py-2.5 rounded-xl text-xs font-extrabold text-stone-600 transition';
+        catSelect.value = 'เงินเดือน / รายรับ';
+      }
+    }
+
+    async function handleSaveTransaction(e) {
+      e.preventDefault();
+      const editId = document.getElementById('tx-edit-id').value;
+      const title = document.getElementById('tx-title-input').value.trim();
+      const amount = parseFloat(document.getElementById('tx-amount-input').value);
+      const date = document.getElementById('tx-date-input').value || getTodayDateParts().iso;
+      const category = document.getElementById('tx-category-input').value;
+      const payer = document.getElementById('tx-payer-input').value;
+      const status = document.querySelector('input[name="tx-status"]:checked')?.value || 'settled';
+
+      if (!title || isNaN(amount) || amount <= 0) return;
+
+      if (editId) {
+        const idx = appState.workspace.transactions.findIndex(t => t.id === editId);
+        if (idx >= 0) {
+          appState.workspace.transactions[idx] = {
+            ...appState.workspace.transactions[idx],
+            title, amount, date, category, payer, status, type: appState.modalTxType
+          };
+        }
+      } else {
+        appState.workspace.transactions.unshift({
+          id: 'tx_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+          title, amount, type: appState.modalTxType, category, payer, date, status
+        });
+      }
+
+      const parts = date.split('-');
+      if (parts.length === 3) {
+        appState.finYear = Math.min(Math.max(parseInt(parts[0], 10), MIN_YEAR), MAX_YEAR);
+        appState.finMonth = parseInt(parts[1], 10) - 1;
+      }
+
+      await saveWorkspaceToDevice();
+      closeTransactionModal();
+      renderApp();
+      showToast(editId ? 'อัปเดตรายการเรียบร้อย' : `บันทึก${appState.modalTxType === 'income' ? 'รายรับ' : 'รายจ่าย'} ฿${formatBaht(amount)} แล้ว`);
+    }
+
+    async function toggleTransactionStatus(txId) {
+      const tx = appState.workspace.transactions.find(t => t.id === txId);
+      if (!tx) return;
+      tx.status = tx.status === 'settled' ? 'pending' : 'settled';
+      await saveWorkspaceToDevice();
+      renderApp();
+      showToast(tx.status === 'settled' ? 'เคลียร์ยอดเรียบร้อย ✓' : 'เปลี่ยนเป็นรอเคลียร์ยอด');
+    }
+
+    async function deleteTransaction(txId) {
+      appState.workspace.transactions = appState.workspace.transactions.filter(t => t.id !== txId);
+      await saveWorkspaceToDevice();
+      renderApp();
+      showToast('ลบรายการแล้ว');
+    }
+
+    function openBudgetModal() {
+      document.getElementById('budget-name-input').value = '';
+      document.getElementById('budget-limit-input').value = '';
+      document.getElementById('budget-modal').classList.remove('hidden');
+    }
+
+    function closeBudgetModal() {
+      document.getElementById('budget-modal').classList.add('hidden');
+    }
+
+    async function handleSaveBudget(e) {
+      e.preventDefault();
+      const name = document.getElementById('budget-name-input').value.trim();
+      const limit = parseFloat(document.getElementById('budget-limit-input').value);
+      if (!name || isNaN(limit) || limit <= 0) return;
+
+      const existing = appState.workspace.budgets.find(b => b.name.toLowerCase() === name.toLowerCase());
+      if (existing) existing.limit = limit;
+      else appState.workspace.budgets.push({ id: 'b_' + Date.now(), name, limit });
+
+      await saveWorkspaceToDevice();
+      closeBudgetModal();
+      renderApp();
+      showToast(`บันทึกหมวดหมู่งบ "${name}" แล้ว`);
+    }
+
+    async function deleteBudgetCategory(budgetId) {
+      appState.workspace.budgets = appState.workspace.budgets.filter(b => b.id !== budgetId);
+      await saveWorkspaceToDevice();
+      renderApp();
+      showToast('ลบหมวดหมู่งบประมาณแล้ว');
+    }
+
+    // ===========================================================
+    // 10. SHOPPING LIST (THAI FILTER PILLS)
+    // ===========================================================
+    function renderShopping() {
+      if (!appState.workspace) return;
+
+      document.getElementById('shopping-filter-pills').innerHTML = SHOPPING_CATEGORIES.map(c => {
+        const active = appState.shoppingFilter === c.id;
+        return `
+          <button onclick="setShoppingFilter('${c.id}')"
+            class="px-3.5 py-2 rounded-full text-xs font-bold flex items-center gap-1.5 transition ${
+              active
+                ? 'bg-[#15803D] text-white shadow-2xs'
+                : 'bg-white text-stone-600 border border-[#D8E5DC] hover:bg-[#ECFDF5]'
+            }">
+            <i class="${c.icon} text-[11px]"></i>
+            <span>${c.id}</span>
+          </button>
+        `;
+      }).join('');
+
+      const items = appState.workspace.shoppingItems || [];
+      const doneCount = items.filter(i => i.done).length;
+      document.getElementById('btn-clear-done-shop').classList.toggle('hidden', doneCount === 0);
+
+      const filtered = appState.shoppingFilter === 'ทั้งหมด'
+        ? items
+        : items.filter(i => i.category === appState.shoppingFilter);
+
+      const container = document.getElementById('shopping-list-items');
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="py-8 text-center text-xs text-stone-400">ยังไม่มีรายการของต้องซื้อในหมวดนี้</div>`;
+      } else {
+        container.innerHTML = filtered.map(item => `
+          <div class="py-3.5 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3 min-w-0">
+              <button onclick="toggleShoppingItem('${item.id}')"
+                class="w-6 h-6 rounded-[8px] border-2 flex items-center justify-center transition shrink-0 ${
+                  item.done
+                    ? 'bg-[#15803D] border-[#15803D] text-white'
+                    : 'border-stone-300 bg-white hover:border-[#15803D]'
+                }">
+                ${item.done ? '<i class="fa-solid fa-check text-xs"></i>' : ''}
+              </button>
+              <span class="text-sm font-semibold truncate ${item.done ? 'line-through text-stone-400' : 'text-stone-800'}">
+                ${escapeHTML(item.title)}
+              </span>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#ECFDF5] text-[#166534]">
+                ${escapeHTML(item.category)}
+              </span>
+              <button onclick="deleteShoppingItem('${item.id}')" class="text-stone-300 hover:text-red-500 text-xs">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      const remaining = items.filter(i => !i.done).length;
+      const navBadge = document.getElementById('nav-shopping-badge');
+      navBadge.textContent = remaining;
+      if (remaining > 0) {
+        navBadge.classList.remove('hidden');
+        navBadge.classList.add('flex');
+      } else {
+        navBadge.classList.add('hidden');
+        navBadge.classList.remove('flex');
+      }
+      document.getElementById('home-shopping-count').textContent = remaining;
+    }
+
+    function setShoppingFilter(cat) {
+      appState.shoppingFilter = cat;
+      renderShopping();
+    }
+
+    async function handleAddShoppingItem(e) {
+      e.preventDefault();
+      const input = document.getElementById('shopping-new-input');
+      const cat = document.getElementById('shopping-new-cat').value;
+      const title = input.value.trim();
+      if (!title) return;
+
+      appState.workspace.shoppingItems.push({
+        id: 'shop_' + Date.now(),
+        title,
+        category: cat,
+        done: false
+      });
+      input.value = '';
+      await saveWorkspaceToDevice();
+      renderShopping();
+      showToast(`เพิ่ม "${title}" แล้ว`);
+    }
+
+    async function toggleShoppingItem(id) {
+      const item = appState.workspace.shoppingItems.find(i => i.id === id);
+      if (!item) return;
+      item.done = !item.done;
+      await saveWorkspaceToDevice();
+      renderShopping();
+    }
+
+    async function deleteShoppingItem(id) {
+      appState.workspace.shoppingItems = appState.workspace.shoppingItems.filter(i => i.id !== id);
+      await saveWorkspaceToDevice();
+      renderShopping();
+    }
+
+    async function clearCompletedShopping() {
+      appState.workspace.shoppingItems = appState.workspace.shoppingItems.filter(i => !i.done);
+      await saveWorkspaceToDevice();
+      renderShopping();
+      showToast('ลบรายการที่ติ๊กซื้อแล้วเรียบร้อย');
+    }
+
+    // ===========================================================
+    // 11. CALENDAR & MOOD TRACKER (2024 TO 2032)
+    // ===========================================================
+    function switchCalendarSubTab(sub) {
+      appState.calSubTab = sub;
+      ['month', 'list', 'mood'].forEach(t => {
+        const btn = document.getElementById(`cal-tab-${t}`);
+        const view = document.getElementById(`cal-subview-${t}`);
+        if (t === sub) {
+          btn.className = 'px-3.5 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 bg-white text-[#166534] shadow-2xs transition';
+          view.classList.remove('hidden');
+        } else {
+          btn.className = 'px-3.5 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 text-stone-600 hover:text-stone-900 transition';
+          view.classList.add('hidden');
+        }
+      });
+      renderCalendar();
+    }
+
+    function setCalendarScope(scope) {
+      appState.calScopeFilter = scope;
+      const sharedBtn = document.getElementById('cal-scope-shared');
+      const personalBtn = document.getElementById('cal-scope-personal');
+
+      sharedBtn.className = scope === 'Shared'
+        ? 'px-3 py-1 rounded-full text-[11px] font-bold bg-[#DCFCE7] text-[#166534] border border-emerald-300 flex items-center gap-1.5 transition'
+        : 'px-3 py-1 rounded-full text-[11px] font-bold bg-white text-stone-600 border border-[#D8E5DC] flex items-center gap-1.5 transition';
+
+      personalBtn.className = scope === 'Personal'
+        ? 'px-3 py-1 rounded-full text-[11px] font-bold bg-[#DCFCE7] text-[#166534] border border-emerald-300 flex items-center gap-1.5 transition'
+        : 'px-3 py-1 rounded-full text-[11px] font-bold bg-white text-stone-600 border border-[#D8E5DC] flex items-center gap-1.5 transition';
+
+      renderCalendar();
+    }
+
+    function changeCalendarMonth(delta) {
+      let m = appState.calMonth + delta;
+      let y = appState.calYear;
+      if (m < 0) { m = 11; y--; }
+      if (m > 11) { m = 0; y++; }
+      if (y < MIN_YEAR) { y = MIN_YEAR; m = 0; }
+      if (y > MAX_YEAR) { y = MAX_YEAR; m = 11; }
+      appState.calMonth = m;
+      appState.calYear = y;
+      appState.calSelectedISO = `${y}-${String(m + 1).padStart(2, '0')}-01`;
+      renderCalendar();
+    }
+
+    function handleCalMonthYearSelect() {
+      appState.calMonth = parseInt(document.getElementById('cal-month-select').value, 10);
+      appState.calYear = parseInt(document.getElementById('cal-year-select').value, 10);
+      appState.calSelectedISO = `${appState.calYear}-${String(appState.calMonth + 1).padStart(2, '0')}-01`;
+      renderCalendar();
+    }
+
+    function jumpCalendarToToday() {
+      const today = getTodayDateParts();
+      appState.calYear = Math.min(Math.max(today.year, MIN_YEAR), MAX_YEAR);
+      appState.calMonth = today.month;
+      appState.calSelectedISO = today.iso;
+      renderCalendar();
+      showToast('กลับมาที่วันนี้เรียบร้อย');
+    }
+
+    function selectCalendarISO(iso) {
+      appState.calSelectedISO = iso;
+      renderCalendar();
+    }
+
+    function getFilteredEventsForISO(iso) {
+      const list = appState.workspace?.calEvents?.[iso] || [];
+      return list.filter(ev => ev.scope === appState.calScopeFilter);
+    }
+
+    function renderCalendar() {
+      if (!appState.workspace) return;
+      document.getElementById('cal-month-select').value = String(appState.calMonth);
+      document.getElementById('cal-year-select').value = String(appState.calYear);
+
+      const year = appState.calYear;
+      const month = appState.calMonth;
+      const todayISO = getTodayDateParts().iso;
+
+      const firstDayOfWeek = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const prevMonthDays = new Date(year, month, 0).getDate();
+
+      let gridHTML = '';
+      for (let i = firstDayOfWeek - 1; i >= 0; i--) {
+        gridHTML += `<div class="py-2.5 text-stone-300 font-medium text-xs">${prevMonthDays - i}</div>`;
+      }
+
+      for (let d = 1; d <= daysInMonth; d++) {
+        const iso = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        const isSelected = appState.calSelectedISO === iso;
+        const isToday = todayISO === iso;
+        const evs = getFilteredEventsForISO(iso);
+        const hasEvent = evs.length > 0;
+
+        gridHTML += `
+          <button onclick="selectCalendarISO('${iso}')"
+            class="py-2 rounded-2xl flex flex-col items-center justify-center relative transition ${
+              isSelected
+                ? 'bg-[#15803D] text-white shadow-xs'
+                : isToday
+                  ? 'bg-[#DCFCE7] text-[#166534] ring-1 ring-[#15803D]'
+                  : 'text-stone-800 hover:bg-[#E9F1EC]'
+            }">
+            <span class="text-xs font-extrabold">${d}</span>
+            <span class="w-1.5 h-1.5 rounded-full mt-0.5 ${
+              hasEvent ? (isSelected ? 'bg-white' : 'bg-[#15803D]') : 'bg-transparent'
+            }"></span>
+          </button>
+        `;
+      }
+
+      const totalCells = firstDayOfWeek + daysInMonth;
+      const trailingCells = (7 - (totalCells % 7)) % 7;
+      for (let n = 1; n <= trailingCells; n++) {
+        gridHTML += `<div class="py-2.5 text-stone-300 font-medium text-xs">${n}</div>`;
+      }
+      document.getElementById('calendar-month-grid').innerHTML = gridHTML;
+
+      const selParts = appState.calSelectedISO.split('-');
+      const selDayNum = parseInt(selParts[2], 10);
+      const selMonthIdx = parseInt(selParts[1], 10) - 1;
+      document.getElementById('cal-selected-date-label').textContent =
+        `${selDayNum} ${THAI_MONTHS[selMonthIdx]} ${selParts[0]} (${appState.calScopeFilter})`;
+
+      const dayEvents = getFilteredEventsForISO(appState.calSelectedISO);
+      const eventBox = document.getElementById('cal-day-events-box');
+      if (dayEvents.length === 0) {
+        eventBox.innerHTML = `
+          <p class="text-xs text-stone-400 font-medium">ไม่มีกิจกรรมในวันนี้</p>
+          <button onclick="openAddEventModal()" class="text-xs font-bold text-[#15803D] mt-2 hover:underline">+ เพิ่มกิจกรรมใหม่</button>
+        `;
+      } else {
+        eventBox.innerHTML = `
+          <div class="space-y-2 text-left">
+            ${dayEvents.map(ev => `
+              <div class="flex items-center justify-between p-3 rounded-2xl bg-[#F4F8F5] border border-[#E1ECE4]">
+                <div class="flex items-center gap-2.5 min-w-0">
+                  <span class="w-2.5 h-2.5 rounded-full bg-[#15803D] shrink-0"></span>
+                  <div class="min-w-0">
+                    <p class="text-xs font-extrabold text-stone-800 truncate">${escapeHTML(ev.title)}</p>
+                    ${ev.time ? `<p class="text-[10px] text-stone-400">เวลา ${escapeHTML(ev.time)}</p>` : ''}
+                  </div>
+                </div>
+                <button onclick="deleteCalendarEvent('${appState.calSelectedISO}', '${ev.id}')" class="text-stone-300 hover:text-red-500 text-xs px-1">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      // Mood Sub-view
+      document.getElementById('mood-selected-date-text').textContent = formatDisplayDate(appState.calSelectedISO);
+      const selectedDayMood = appState.workspace.dayMoods?.[appState.calSelectedISO] || null;
+
+      document.getElementById('mood-selector-row').innerHTML = Object.keys(MOOD_META).map(mKey => {
+        const meta = MOOD_META[mKey];
+        const active = selectedDayMood === mKey;
+        return `
+          <button onclick="saveMoodForSelectedDate('${mKey}')"
+            class="py-2.5 px-1 rounded-2xl flex flex-col items-center justify-between gap-2 transition ${
+              active ? 'ring-2 ring-[#15803D] bg-[#ECFDF5]' : 'hover:bg-[#F4F8F5]'
+            }">
+            <div class="h-11 flex items-center justify-center">
+              <div class="${meta.shapeClass} flex items-center justify-center shadow-2xs" style="background-color: ${meta.color}">
+                ${meta.svg}
+              </div>
+            </div>
+            <span class="text-[11px] font-bold ${active ? 'text-[#166534]' : 'text-stone-500'}">${meta.label}</span>
+          </button>
+        `;
+      }).join('');
+
+      const moodBanner = document.getElementById('mood-banner-card');
+      if (selectedDayMood && MOOD_META[selectedDayMood]) {
+        const mm = MOOD_META[selectedDayMood];
+        moodBanner.innerHTML = `
+          <div class="flex items-center gap-3">
+            <div class="${mm.shapeClass} flex items-center justify-center shrink-0" style="background-color: ${mm.color}">
+              ${mm.svg}
+            </div>
+            <div>
+              <p class="text-xs font-bold text-stone-800">${escapeHTML(appState.currentUser.displayName)} feeling <span class="text-[#15803D]">${mm.label.toLowerCase()}</span> (${mm.thLabel})</p>
+              <p class="text-[11px] text-stone-400">${appState.calSelectedISO}</p>
+            </div>
+          </div>
+          <button onclick="clearMoodForSelectedDate()" class="text-[11px] font-bold text-stone-400 hover:text-red-500">ลบ</button>
+        `;
+      } else {
+        moodBanner.innerHTML = `<span class="text-xs text-stone-400">แตะไอคอนด้านบนเพื่อบันทึกอารมณ์ของวันที่ ${formatDisplayDate(appState.calSelectedISO)}</span>`;
+      }
+
+      let moodGridHTML = '';
+      for (let i = 0; i < firstDayOfWeek; i++) moodGridHTML += `<div></div>`;
+      for (let d = 1; d <= daysInMonth; d++) {
+        const iso = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        const mName = appState.workspace.dayMoods?.[iso];
+        const mMeta = mName ? MOOD_META[mName] : null;
+        const isSel = appState.calSelectedISO === iso;
+        moodGridHTML += `
+          <button onclick="selectCalendarISO('${iso}')"
+            class="h-10 rounded-xl flex items-center justify-center text-xs font-bold transition ${isSel ? 'ring-2 ring-[#15803D]' : ''}"
+            style="background-color: ${mMeta ? mMeta.color : '#E9F1EC'}; color: #1C1917">
+            ${d}
+          </button>
+        `;
+      }
+      document.getElementById('mood-calendar-grid').innerHTML = moodGridHTML;
+
+      // List Sub-view
+      const monthPrefix = `${year}-${String(month + 1).padStart(2, '0')}-`;
+      const allKeys = Object.keys(appState.workspace.calEvents || {}).filter(k => k.startsWith(monthPrefix)).sort();
+      const rows = [];
+      allKeys.forEach(iso => {
+        getFilteredEventsForISO(iso).forEach(ev => rows.push({ iso, ev }));
+      });
+
+      const listEl = document.getElementById('cal-all-events-list');
+      if (rows.length === 0) {
+        listEl.innerHTML = `<div class="py-8 text-center text-xs text-stone-400">ไม่มีรายการกิจกรรม (${appState.calScopeFilter}) ในเดือน ${THAI_MONTHS[month]} ${year}</div>`;
+      } else {
+        listEl.innerHTML = rows.map(({ iso, ev }) => `
+          <div class="py-3 flex items-center justify-between gap-2">
+            <div class="flex items-center gap-3 min-w-0">
+              <span class="px-2.5 py-1.5 rounded-xl bg-[#DCFCE7] text-[#166534] font-extrabold text-[11px] shrink-0">${iso.slice(8)} ${SHORT_THAI_MONTHS[month]}</span>
+              <div class="min-w-0">
+                <p class="text-xs font-bold text-stone-800 truncate">${escapeHTML(ev.title)}</p>
+                ${ev.time ? `<p class="text-[10px] text-stone-400">เวลา ${escapeHTML(ev.time)}</p>` : ''}
+              </div>
+            </div>
+            <button onclick="deleteCalendarEvent('${iso}', '${ev.id}')" class="text-stone-300 hover:text-red-500 text-xs">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </div>
+        `).join('');
+      }
+    }
+
+    async function saveMoodForSelectedDate(moodKey) {
+      if (!appState.workspace.dayMoods) appState.workspace.dayMoods = {};
+      appState.workspace.dayMoods[appState.calSelectedISO] = moodKey;
+      await saveWorkspaceToDevice();
+      renderCalendar();
+      renderHomeDashboard();
+      showToast(`บันทึกอารมณ์ ${MOOD_META[moodKey].label} แล้ว`);
+    }
+
+    async function clearMoodForSelectedDate() {
+      if (appState.workspace.dayMoods) {
+        delete appState.workspace.dayMoods[appState.calSelectedISO];
+        await saveWorkspaceToDevice();
+        renderCalendar();
+        renderHomeDashboard();
+      }
+    }
+
+    function openAddEventModal() {
+      document.getElementById('event-date-input').value = appState.calSelectedISO || getTodayDateParts().iso;
+      document.getElementById('event-title-input').value = '';
+      document.getElementById('event-time-input').value = '';
+      document.getElementById('event-scope-input').value = appState.calScopeFilter;
+      document.getElementById('event-modal').classList.remove('hidden');
+    }
+
+    function closeAddEventModal() {
+      document.getElementById('event-modal').classList.add('hidden');
+    }
+
+    async function handleSaveEvent(e) {
+      e.preventDefault();
+      const iso = document.getElementById('event-date-input').value;
+      const title = document.getElementById('event-title-input').value.trim();
+      const time = document.getElementById('event-time-input').value;
+      const scope = document.getElementById('event-scope-input').value;
+      if (!iso || !title) return;
+
+      if (!appState.workspace.calEvents[iso]) appState.workspace.calEvents[iso] = [];
+      appState.workspace.calEvents[iso].push({ id: 'ev_' + Date.now(), title, time, scope });
+
+      appState.calScopeFilter = scope;
+      const parts = iso.split('-');
+      if (parts.length === 3) {
+        appState.calYear = Math.min(Math.max(parseInt(parts[0], 10), MIN_YEAR), MAX_YEAR);
+        appState.calMonth = parseInt(parts[1], 10) - 1;
+        appState.calSelectedISO = iso;
+      }
+
+      await saveWorkspaceToDevice();
+      closeAddEventModal();
+      setCalendarScope(scope);
+      showToast('บันทึกกิจกรรมเรียบร้อย');
+    }
+
+    async function deleteCalendarEvent(iso, evId) {
+      if (!appState.workspace.calEvents[iso]) return;
+      appState.workspace.calEvents[iso] = appState.workspace.calEvents[iso].filter(ev => ev.id !== evId);
+      await saveWorkspaceToDevice();
+      renderCalendar();
+      showToast('ลบกิจกรรมแล้ว');
+    }
+
+    // ===========================================================
+    // 12. PETS MODULE
+    // ===========================================================
+    function selectPetEmoji(emoji) {
+      selectedPetEmoji = emoji;
+      document.querySelectorAll('#pet-emoji-picker button').forEach(btn => {
+        btn.className = btn.dataset.emoji === emoji
+          ? 'w-10 h-10 rounded-xl bg-[#DCFCE7] ring-2 ring-[#15803D] text-lg'
+          : 'w-10 h-10 rounded-xl bg-white border border-[#D8E5DC] text-lg';
+      });
+    }
+
+    function renderPets() {
+      if (!appState.workspace) return;
+      const query = (document.getElementById('pet-search-input')?.value || '').toLowerCase();
+      const pets = appState.workspace.pets || [];
+      document.getElementById('pet-count-label').textContent = pets.length;
+
+      const filtered = pets.filter(p =>
+        p.name.toLowerCase().includes(query) || p.breed.toLowerCase().includes(query)
+      );
+
+      const container = document.getElementById('pet-cards-container');
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="soft-card rounded-[28px] p-8 text-center space-y-2.5">
+            <div class="w-12 h-12 rounded-2xl bg-[#ECFDF5] text-[#15803D] mx-auto flex items-center justify-center">
+              <i class="fa-solid fa-paw text-lg"></i>
+            </div>
+            <p class="text-xs font-bold text-stone-700">${pets.length === 0 ? 'ยังไม่มีโปรไฟล์สัตว์เลี้ยง' : 'ไม่พบสัตว์เลี้ยงที่ค้นหา'}</p>
+            <p class="text-[11px] text-stone-400">กดปุ่ม "+" มุมขวาบนเพื่อเพิ่มชื่อ สายพันธุ์ น้ำหนัก และวันฉีดวัคซีน</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map(p => `
+        <div class="soft-card rounded-[26px] overflow-hidden flex min-h-[144px]">
+          <div class="w-[122px] relative shrink-0 bg-[#E9F1EC] flex items-center justify-center">
+            ${p.photoData
+              ? `<img src="${p.photoData}" alt="${escapeHTML(p.name)}" class="w-full h-full object-cover" />`
+              : `<div class="flex flex-col items-center"><span class="text-4xl">${escapeHTML(p.emoji || '🐾')}</span><span class="text-[10px] font-bold text-[#166534] mt-1">${escapeHTML(p.name)}</span></div>`
+            }
+            <div class="absolute top-2.5 right-2.5 w-6 h-6 rounded-full bg-white/90 text-[#15803D] flex items-center justify-center shadow-2xs text-[10px]">
+              <i class="fa-solid fa-heart"></i>
+            </div>
+          </div>
+          <div class="flex-1 p-4 flex flex-col justify-between min-w-0">
+            <div class="flex items-start justify-between gap-2">
+              <div class="min-w-0">
+                <div class="flex items-baseline gap-2">
+                  <h3 class="text-base font-extrabold text-stone-900 truncate">${escapeHTML(p.name)}</h3>
+                  <span class="text-[10px] font-bold text-[#166534] bg-[#DCFCE7] px-2 py-0.5 rounded-full shrink-0">${escapeHTML(p.gender)}</span>
+                </div>
+                <p class="text-xs text-stone-500 mt-0.5 truncate">${escapeHTML(p.breed)}</p>
+              </div>
+              <button onclick="deletePet('${p.id}')" class="text-stone-300 hover:text-red-500 text-xs">
+                <i class="fa-regular fa-trash-can"></i>
+              </button>
+            </div>
+
+            <div class="space-y-1 pt-2 text-xs">
+              <div class="flex justify-between">
+                <span class="text-stone-400">Age:</span>
+                <span class="font-bold text-stone-800">${escapeHTML(p.age || '-')}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-stone-400">Weight:</span>
+                <span class="font-bold text-stone-800">${escapeHTML(p.weight || '-')}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-stone-400">Last Vaccine:</span>
+                <span class="font-bold text-[#15803D]">${p.vaccine ? formatDisplayDate(p.vaccine) : '-'}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function openAddPetModal() {
+      document.getElementById('pet-name-input').value = '';
+      document.getElementById('pet-breed-input').value = '';
+      document.getElementById('pet-age-input').value = '';
+      document.getElementById('pet-weight-input').value = '';
+      document.getElementById('pet-vaccine-input').value = '';
+      document.getElementById('pet-photo-input').value = '';
+      selectPetEmoji('🐶');
+      document.getElementById('pet-modal').classList.remove('hidden');
+    }
+
+    function closeAddPetModal() {
+      document.getElementById('pet-modal').classList.add('hidden');
+    }
+
+    function resizeImageFile(file, maxSize = 340) {
+      return new Promise((resolve) => {
+        if (!file) { resolve(null); return; }
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let w = img.width, h = img.height;
+            if (w > h && w > maxSize) { h = Math.round((h * maxSize) / w); w = maxSize; }
+            else if (h >= w && h > maxSize) { w = Math.round((w * maxSize) / h); h = maxSize; }
+            canvas.width = w;
+            canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            resolve(canvas.toDataURL('image/jpeg', 0.82));
+          };
+          img.onerror = () => resolve(null);
+          img.src = ev.target.result;
+        };
+        reader.onerror = () => resolve(null);
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function handleSavePet(e) {
+      e.preventDefault();
+      const name = document.getElementById('pet-name-input').value.trim();
+      const gender = document.getElementById('pet-gender-input').value;
+      const breed = document.getElementById('pet-breed-input').value.trim();
+      const age = document.getElementById('pet-age-input').value.trim();
+      const weight = document.getElementById('pet-weight-input').value.trim();
+      const vaccine = document.getElementById('pet-vaccine-input').value;
+      const file = document.getElementById('pet-photo-input').files[0];
+
+      const photoData = await resizeImageFile(file);
+      appState.workspace.pets.push({
+        id: 'pet_' + Date.now(),
+        name, gender, breed, age, weight, vaccine,
+        emoji: selectedPetEmoji,
+        photoData
+      });
+
+      await saveWorkspaceToDevice();
+      closeAddPetModal();
+      renderPets();
+      showToast(`บันทึกข้อมูล ${name} เรียบร้อย`);
+    }
+
+    async function deletePet(petId) {
+      appState.workspace.pets = appState.workspace.pets.filter(p => p.id !== petId);
+      await saveWorkspaceToDevice();
+      renderPets();
+      showToast('ลบโปรไฟล์สัตว์เลี้ยงแล้ว');
+    }
+
+    // ===========================================================
+    // 13. PROFILE & DATABASE BACKUP / RESTORE (.JSON & .CSV)
+    // ===========================================================
+    function renderProfileAndHeader() {
+      const u = appState.currentUser;
+      if (!u) return;
+
+      const hasPartner = Boolean(u.partnerName && u.partnerName.trim());
+      if (!hasPartner) u.activePayer = u.displayName;
+      const activePayer = u.activePayer || u.displayName;
+
+      document.getElementById('header-user-badge').textContent = activePayer.charAt(0).toUpperCase();
+      document.getElementById('header-user-badge').style.backgroundColor =
+        activePayer === u.displayName ? (u.badgeColor || '#15803D') : '#334155';
+      document.getElementById('header-user-name').textContent = activePayer;
+
+      const partnerWrap = document.getElementById('header-partner-wrap');
+      const switchIcon = document.getElementById('header-switch-icon');
+      if (hasPartner) {
+        partnerWrap.classList.remove('hidden');
+        switchIcon.classList.remove('hidden');
+        document.getElementById('header-partner-name').textContent =
+          activePayer === u.displayName ? u.partnerName : u.displayName;
+      } else {
+        partnerWrap.classList.add('hidden');
+        switchIcon.classList.add('hidden');
+      }
+
+      document.getElementById('home-greeting-title').textContent = hasPartner
+        ? `${u.displayName} & ${u.partnerName}`
+        : u.displayName;
+      document.getElementById('home-mode-badge').textContent = hasPartner ? 'กระเป๋าร่วม (Shared)' : 'ใช้งานคนเดียว (Solo)';
+      document.getElementById('shopping-subtitle-names').textContent = hasPartner
+        ? `${u.displayName} & ${u.partnerName}`
+        : u.displayName;
+
+      document.getElementById('profile-avatar').textContent = u.displayName.charAt(0).toUpperCase();
+      document.getElementById('profile-avatar').style.backgroundColor = u.badgeColor || '#15803D';
+      document.getElementById('profile-display-name').textContent = u.displayName;
+      document.getElementById('profile-username-label').textContent = `@${u.username}`;
+      document.getElementById('profile-partner-badge').textContent = hasPartner
+        ? `กระเป๋าร่วมกับคู่หู: ${u.partnerName}`
+        : 'ใช้งานคนเดียว (กดแก้ไขเพื่อเพิ่มชื่อคู่หูได้)';
+
+      updateDatabaseStatsUI();
+    }
+
+    function updateDatabaseStatsUI() {
+      if (!appState.workspace) return;
+      document.getElementById('db-engine-badge').textContent = LocalDB.usingFallback ? 'LocalStorage' : 'IndexedDB';
+
+      const txCount = (appState.workspace.transactions || []).length;
+      const shopCount = (appState.workspace.shoppingItems || []).length;
+      const petCount = (appState.workspace.pets || []).length;
+      document.getElementById('db-stats-records').textContent =
+        `รับ-จ่าย ${txCount} · ซื้อของ ${shopCount} · สัตว์เลี้ยง ${petCount}`;
+
+      if (appState.workspace.lastSavedAt) {
+        const dt = new Date(appState.workspace.lastSavedAt);
+        const hh = String(dt.getHours()).padStart(2, '0');
+        const mm = String(dt.getMinutes()).padStart(2, '0');
+        const ss = String(dt.getSeconds()).padStart(2, '0');
+        document.getElementById('db-stats-saved').textContent = `${hh}:${mm}:${ss} น.`;
+      }
+    }
+
+    function openEditProfileModal() {
+      const u = appState.currentUser;
+      if (!u) return;
+      document.getElementById('edit-displayname-input').value = u.displayName;
+      document.getElementById('edit-partner-input').value = u.partnerName || '';
+      document.getElementById('profile-modal').classList.remove('hidden');
+    }
+
+    function closeEditProfileModal() {
+      document.getElementById('profile-modal').classList.add('hidden');
+    }
+
+    async function handleSaveProfile(e) {
+      e.preventDefault();
+      const newDisplay = document.getElementById('edit-displayname-input').value.trim();
+      const newPartner = document.getElementById('edit-partner-input').value.trim();
+      if (!newDisplay) return;
+
+      appState.currentUser.displayName = newDisplay;
+      appState.currentUser.partnerName = newPartner;
+      appState.currentUser.activePayer = newDisplay;
+
+      await saveWorkspaceToDevice();
+      closeEditProfileModal();
+      renderApp();
+      showToast('อัปเดตโปรไฟล์เรียบร้อยแล้ว');
+    }
+
+    // ===========================================================
+    // 14. FIXED SMART SHARE & SCANNABLE QR SYSTEM (iPhone FIXED)
+    // ===========================================================
+    function detectLivePublicUrl() {
+      const href = (window.location.href || '').trim();
+      if (!/^https?:\/\//i.test(href)) return '';
+      const lower = href.toLowerCase();
+      // Exclude sandboxed / temporary preview iframe URLs that iPhone cannot open
+      if (
+        lower.startsWith('about:') ||
+        lower.startsWith('blob:') ||
+        lower.startsWith('file:') ||
+        lower.startsWith('data:') ||
+        lower.includes('usercontent.goog')
+      ) {
+        return '';
+      }
+      return href.split('#')[0];
+    }
+
+    function normalizeAndValidateHttpUrl(rawInput) {
+      let str = (rawInput || '').trim();
+      if (!str) return '';
+      if (!/^https?:\/\//i.test(str) && /^[a-z0-9-]+(\.[a-z0-9-]+)+/i.test(str)) {
+        str = 'https://' + str;
+      }
+      try {
+        const u = new URL(str);
+        if (u.protocol !== 'http:' && u.protocol !== 'https:') return '';
+        if (!u.hostname || u.hostname.includes('usercontent.goog')) return '';
+        if (!u.hostname.includes('.') && u.hostname !== 'localhost') return '';
+        return u.href;
+      } catch (_) {
+        return '';
+      }
+    }
+
+    function getEffectivePublicShareUrl() {
+      const saved = normalizeAndValidateHttpUrl(appState.customShareUrl);
+      if (saved) return saved;
+      return detectLivePublicUrl();
+    }
+
+    function renderGenuineQRCode(validUrl) {
+      const canvas = document.getElementById('share-qr-canvas');
+      const fallbackImg = document.getElementById('share-qr-fallback-img');
+
+      try {
+        if (typeof window.qrcode === 'function') {
+          // TypeNumber 0 = auto-detect optimal QR version; ErrorCorrectionLevel 'M'
+          const qr = window.qrcode(0, 'M');
+          qr.addData(validUrl);
+          qr.make();
+
+          const moduleCount = qr.getModuleCount();
+          const quietZoneModules = 4; // Mandatory 4-module white quiet zone for iOS Scanner
+          const totalModules = moduleCount + quietZoneModules * 2;
+          const cellSize = Math.max(5, Math.floor(240 / totalModules));
+          const sizePx = totalModules * cellSize;
+
+          canvas.width = sizePx;
+          canvas.height = sizePx;
+          canvas.style.width = '220px';
+          canvas.style.height = '220px';
+
+          const ctx = canvas.getContext('2d');
+          // Crisp Pure White Background
+          ctx.fillStyle = '#FFFFFF';
+          ctx.fillRect(0, 0, sizePx, sizePx);
+
+          // Pure Black Modules (#000000) for maximum iPhone Camera & Code Scanner contrast
+          ctx.fillStyle = '#000000';
+          for (let row = 0; row < moduleCount; row++) {
+            for (let col = 0; col < moduleCount; col++) {
+              if (qr.isDark(row, col)) {
+                ctx.fillRect(
+                  (col + quietZoneModules) * cellSize,
+                  (row + quietZoneModules) * cellSize,
+                  cellSize,
+                  cellSize
+                );
+              }
+            }
+          }
+
+          canvas.classList.remove('hidden');
+          fallbackImg.classList.add('hidden');
+          return;
+        }
+      } catch (_) {}
+
+      // Reliable fallback QR API image if CDN script was blocked
+      canvas.classList.add('hidden');
+      fallbackImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=280x280&margin=16&ecc=M&data=${encodeURIComponent(validUrl)}`;
+      fallbackImg.classList.remove('hidden');
+    }
+
+    function refreshShareModalView() {
+      const effectiveUrl = getEffectivePublicShareUrl();
+      const previewNotice = document.getElementById('share-preview-notice');
+      const validQrCard = document.getElementById('share-valid-qr-card');
+      const extraHtmlWrap = document.getElementById('share-extra-html-btn-wrap');
+      const clearBtn = document.getElementById('clear-share-url-btn');
+      const msgEl = document.getElementById('share-url-validation-msg');
+
+      clearBtn.classList.toggle('hidden', !appState.customShareUrl);
+
+      if (effectiveUrl) {
+        previewNotice.classList.add('hidden');
+        validQrCard.classList.remove('hidden');
+        extraHtmlWrap.classList.remove('hidden');
+        document.getElementById('share-qr-encoded-url').textContent = effectiveUrl;
+        renderGenuineQRCode(effectiveUrl);
+        msgEl.textContent = 'ลิงก์ถูกต้อง · กล้อง iPhone และ Android สามารถสแกนเข้าเว็บได้ทันที';
+        msgEl.className = 'text-[10px] font-semibold text-[#15803D]';
+      } else {
+        validQrCard.classList.add('hidden');
+        extraHtmlWrap.classList.add('hidden');
+        previewNotice.classList.remove('hidden');
+        msgEl.textContent = 'วางลิงก์ https://... แล้วกด "สร้าง QR" เพื่อแสดง QR Code ที่สแกนได้จริง';
+        msgEl.className = 'text-[10px] text-stone-400';
+      }
+    }
+
+    function openShareModal(defaultTab = 'link') {
+      const autoLiveUrl = detectLivePublicUrl();
+      const inputEl = document.getElementById('public-share-url-input');
+      inputEl.value = appState.customShareUrl || autoLiveUrl || '';
+
+      document.getElementById('share-summary-textarea').value = buildMonthlySummaryText();
+      refreshShareModalView();
+      switchShareTab(defaultTab);
+      document.getElementById('share-modal').classList.remove('hidden');
+    }
+
+    function closeShareModal() {
+      document.getElementById('share-modal').classList.add('hidden');
+    }
+
+    function handlePublicShareUrlInput() {
+      const raw = document.getElementById('public-share-url-input').value.trim();
+      const msgEl = document.getElementById('share-url-validation-msg');
+      if (!raw) {
+        msgEl.textContent = 'วางลิงก์ https://... แล้วกด "สร้าง QR"';
+        msgEl.className = 'text-[10px] text-stone-400';
+        return;
+      }
+      const valid = normalizeAndValidateHttpUrl(raw);
+      if (valid) {
+        msgEl.textContent = `รูปแบบลิงก์ถูกต้อง (${valid}) กด "สร้าง QR" เพื่อบันทึก`;
+        msgEl.className = 'text-[10px] font-semibold text-[#15803D]';
+      } else {
+        msgEl.textContent = 'กรุณากรอกลิงก์เว็บไซต์ที่ขึ้นต้นด้วย https:// เช่น https://myapp.netlify.app';
+        msgEl.className = 'text-[10px] font-semibold text-amber-600';
+      }
+    }
+
+    async function applyAndSaveShareUrl() {
+      const inputEl = document.getElementById('public-share-url-input');
+      const raw = inputEl.value.trim();
+      if (!raw) {
+        await clearSavedShareUrl();
+        return;
+      }
+      const normalized = normalizeAndValidateHttpUrl(raw);
+      if (!normalized) {
+        showToast('กรุณาระบุลิงก์เว็บไซต์ https:// ที่ถูกต้อง');
+        return;
+      }
+      inputEl.value = normalized;
+      appState.customShareUrl = normalized;
+      await LocalDB.put('meta', { key: 'customShareUrl', url: normalized });
+      refreshShareModalView();
+      showToast('สร้าง QR Code ที่สแกนได้จริงเรียบร้อย');
+    }
+
+    async function clearSavedShareUrl() {
+      appState.customShareUrl = '';
+      document.getElementById('public-share-url-input').value = detectLivePublicUrl() || '';
+      await LocalDB.put('meta', { key: 'customShareUrl', url: '' });
+      refreshShareModalView();
+      showToast('ล้างลิงก์ที่กำหนดเองแล้ว');
+    }
+
+    function copyConfiguredShareUrl() {
+      const url = getEffectivePublicShareUrl();
+      if (!url) return;
+      copyTextSafe(url, 'คัดลอกลิงก์เว็บแอปเรียบร้อย');
+    }
+
+    async function triggerNativeShareUrl() {
+      const url = getEffectivePublicShareUrl();
+      if (!url) return;
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: 'Verdant — เว็บแอปบันทึกรายรับ-รายจ่ายมินิมอล',
+            text: 'เว็บแอปจดบันทึกรายรับ-รายจ่าย งบรายเดือน และปฏิทินมินิมอล',
+            url
+          });
+          return;
+        } catch (_) {}
+      }
+      copyConfiguredShareUrl();
+    }
+
+    function downloadQRImagePNG() {
+      const canvas = document.getElementById('share-qr-canvas');
+      if (!canvas || canvas.classList.contains('hidden')) {
+        showToast('กรุณาบันทึกภาพจาก QR Code โดยตรง');
+        return;
+      }
+      const dataUrl = canvas.toDataURL('image/png');
+      const a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = `verdant-finance-qr-${getTodayDateParts().iso}.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      showToast('บันทึกรูป QR Code (.PNG) ลงเครื่องแล้ว');
+    }
+
+    // Generate Clean Standalone .HTML File for Sharing or Hosting on Netlify Drop
+    async function downloadStandaloneHTMLApp() {
+      const clonedRoot = document.documentElement.cloneNode(true);
+
+      // Reset transient runtime UI states on the cloned HTML so recipients open a clean app
+      const hideIds = [
+        'auth-view', 'main-app-view', 'tx-modal', 'budget-modal',
+        'event-modal', 'pet-modal', 'profile-modal', 'share-modal', 'confirm-modal'
+      ];
+      hideIds.forEach(id => {
+        const el = clonedRoot.querySelector(`#${id}`);
+        if (el) el.classList.add('hidden');
+      });
+
+      const qrCanvas = clonedRoot.querySelector('#share-qr-canvas');
+      if (qrCanvas) {
+        qrCanvas.removeAttribute('width');
+        qrCanvas.removeAttribute('height');
+      }
+
+      const standaloneHTML = '<!DOCTYPE html>\n' + clonedRoot.outerHTML;
+      await saveTextFileToDevice('verdant-finance-app.html', standaloneHTML, 'text/html;charset=utf-8');
+    }
+
+    function switchShareTab(tab) {
+      const linkBtn = document.getElementById('share-tab-link');
+      const sumBtn = document.getElementById('share-tab-summary');
+      const linkPanel = document.getElementById('share-panel-link');
+      const sumPanel = document.getElementById('share-panel-summary');
+
+      if (tab === 'link') {
+        linkPanel.classList.remove('hidden');
+        sumPanel.classList.add('hidden');
+        linkBtn.className = 'py-2 rounded-xl text-xs font-bold bg-white text-[#166534] shadow-2xs transition';
+        sumBtn.className = 'py-2 rounded-xl text-xs font-bold text-stone-600 transition';
+      } else {
+        document.getElementById('share-summary-textarea').value = buildMonthlySummaryText();
+        linkPanel.classList.add('hidden');
+        sumPanel.classList.remove('hidden');
+        sumBtn.className = 'py-2 rounded-xl text-xs font-bold bg-white text-[#166534] shadow-2xs transition';
+        linkBtn.className = 'py-2 rounded-xl text-xs font-bold text-stone-600 transition';
+      }
+    }
+
+    function buildMonthlySummaryText() {
+      if (!appState.currentUser || !appState.workspace) {
+        return '🌿 Verdant Finance — เว็บแอปบันทึกรายรับ-รายจ่ายและงบรายเดือนแบบมินิมอล';
+      }
+      const mName = THAI_MONTHS[appState.finMonth];
+      const y = appState.finYear;
+      const txs = getTransactionsForMonth(y, appState.finMonth);
+      const inc = txs.filter(t => t.type === 'income').reduce((s, t) => s + Number(t.amount), 0);
+      const exp = txs.filter(t => t.type === 'expense').reduce((s, t) => s + Number(t.amount), 0);
+      const net = inc - exp;
+      const u = appState.currentUser;
+
+      const lines = [
+        `🌿 สรุปรายรับ-รายจ่ายประจำเดือน ${mName} ${y}`,
+        `กระเป๋า: ${u.displayName}${u.partnerName ? ' & ' + u.partnerName : ''}`,
+        `━━━━━━━━━━━━━━`,
+        `• รายรับเดือนนี้: +฿${formatBaht(inc)}`,
+        `• รายจ่ายเดือนนี้: ฿${formatBaht(exp)}`,
+        `• คงเหลือสุทธิ: ${net >= 0 ? '฿' : '-฿'}${formatBaht(Math.abs(net))}`
+      ];
+
+      if (u.partnerName) {
+        const u1Paid = txs.filter(t => t.type === 'expense' && t.payer === u.displayName).reduce((s, t) => s + Number(t.amount), 0);
+        const u2Paid = txs.filter(t => t.type === 'expense' && t.payer === u.partnerName).reduce((s, t) => s + Number(t.amount), 0);
+        const pendingSum = txs.filter(t => t.type === 'expense' && t.status === 'pending').reduce((s, t) => s + Number(t.amount), 0);
+        lines.push(`━━━━━━━━━━━━━━`);
+        lines.push(`• ${u.displayName} จ่ายแล้ว: ฿${formatBaht(u1Paid)}`);
+        lines.push(`• ${u.partnerName} จ่ายแล้ว: ฿${formatBaht(u2Paid)}`);
+        lines.push(`• ยอดรอเคลียร์รวม: ฿${formatBaht(pendingSum)}`);
+      }
+
+      const publicUrl = getEffectivePublicShareUrl();
+      if (publicUrl) {
+        lines.push(`━━━━━━━━━━━━━━`);
+        lines.push(`🔗 เปิดเว็บแอป: ${publicUrl}`);
+      }
+      return lines.join('\n');
+    }
+
+    function copySummaryText() {
+      copyTextSafe(document.getElementById('share-summary-textarea').value, 'คัดลอกสรุปรายรับ-รายจ่ายเดือนนี้แล้ว');
+    }
+
+    async function shareSummaryNative() {
+      const text = document.getElementById('share-summary-textarea').value;
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: 'สรุปรายรับ-รายจ่ายประจำเดือน', text });
+          return;
+        } catch (_) {}
+      }
+      copySummaryText();
+    }
+
+    // ===========================================================
+    // 15. FILE EXPORT / IMPORT (.JSON & .CSV WITH UTF-8 BOM)
+    // ===========================================================
+    async function saveTextFileToDevice(filename, content, mimeType) {
+      if (window.showSaveFilePicker) {
+        try {
+          const ext = filename.endsWith('.csv') ? '.csv' : filename.endsWith('.html') ? '.html' : '.json';
+          const baseMime = mimeType.split(';')[0];
+          const handle = await window.showSaveFilePicker({
+            suggestedName: filename,
+            types: [{
+              description: filename,
+              accept: { [baseMime]: [ext] }
+            }]
+          });
+          const writable = await handle.createWritable();
+          await writable.write(content);
+          await writable.close();
+          showToast(`บันทึกไฟล์ ${filename} ลงเครื่องแล้ว`);
+          return;
+        } catch (err) {
+          if (err && err.name === 'AbortError') return;
+        }
+      }
+
+      const blob = new Blob([content], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1200);
+      showToast(`ดาวน์โหลดไฟล์ ${filename} เรียบร้อย`);
+    }
+
+    async function exportDatabaseFileToDevice() {
+      if (!appState.currentUser || !appState.workspace) return;
+      const payload = {
+        db: 'GreenFinanceDB',
+        exportedAt: new Date().toISOString(),
+        customShareUrl: appState.customShareUrl || '',
+        userProfile: {
+          username: appState.currentUser.username,
+          displayName: appState.currentUser.displayName,
+          partnerName: appState.currentUser.partnerName,
+          badgeColor: appState.currentUser.badgeColor,
+          passwordHash: appState.currentUser.passwordHash
+        },
+        workspace: appState.workspace
+      };
+      const fname = `greenfinance-backup-${appState.currentUser.username}-${getTodayDateParts().iso}.json`;
+      await saveTextFileToDevice(fname, JSON.stringify(payload, null, 2), 'application/json;charset=utf-8');
+    }
+
+    async function exportTransactionsCSV() {
+      if (!appState.workspace) return;
+      const txs = appState.workspace.transactions || [];
+      const header = ['วันที่', 'ประเภท', 'รายการ', 'หมวดหมู่', 'จำนวนเงิน (บาท)', 'ผู้ทำรายการ', 'สถานะ'];
+      const rows = txs.map(t => [
+        t.date,
+        t.type === 'income' ? 'รายรับ' : 'รายจ่าย',
+        `"${String(t.title || '').replace(/"/g, '""')}"`,
+        `"${String(t.category || '').replace(/"/g, '""')}"`,
+        t.amount,
+        `"${String(t.payer || '').replace(/"/g, '""')}"`,
+        t.status === 'settled' ? 'เคลียร์แล้ว' : 'รอเคลียร์ยอด'
+      ]);
+      const csvContent = '\uFEFF' + [header.join(','), ...rows.map(r => r.join(','))].join('\r\n');
+      const fname = `greenfinance-transactions-${getTodayDateParts().iso}.csv`;
+      await saveTextFileToDevice(fname, csvContent, 'text/csv;charset=utf-8');
+    }
+
+    async function handleImportWorkspaceJSON(event) {
+      const file = event.target.files?.[0];
+      event.target.value = '';
+      if (!file || !appState.currentUser) return;
+
+      try {
+        const text = await file.text();
+        const parsed = JSON.parse(text);
+        const importedWS = parsed.workspace || parsed;
+
+        if (!importedWS || !Array.isArray(importedWS.transactions)) {
+          showToast('ไฟล์ .JSON ไม่ใช่รูปแบบฐานข้อมูลที่รองรับ');
+          return;
+        }
+
+        const existingTxIds = new Set(appState.workspace.transactions.map(t => t.id));
+        importedWS.transactions.forEach(t => {
+          if (!existingTxIds.has(t.id)) appState.workspace.transactions.push(t);
+        });
+        appState.workspace.transactions.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+
+        if (Array.isArray(importedWS.budgets) && importedWS.budgets.length > 0) {
+          appState.workspace.budgets = importedWS.budgets;
+        }
+        if (Array.isArray(importedWS.shoppingItems)) {
+          const shopIds = new Set(appState.workspace.shoppingItems.map(s => s.id));
+          importedWS.shoppingItems.forEach(s => {
+            if (!shopIds.has(s.id)) appState.workspace.shoppingItems.push(s);
+          });
+        }
+        if (importedWS.calEvents && typeof importedWS.calEvents === 'object') {
+          appState.workspace.calEvents = { ...appState.workspace.calEvents, ...importedWS.calEvents };
+        }
+        if (importedWS.dayMoods && typeof importedWS.dayMoods === 'object') {
+          appState.workspace.dayMoods = { ...appState.workspace.dayMoods, ...importedWS.dayMoods };
+        }
+        if (Array.isArray(importedWS.pets)) {
+          const petIds = new Set(appState.workspace.pets.map(p => p.id));
+          importedWS.pets.forEach(p => {
+            if (!petIds.has(p.id)) appState.workspace.pets.push(p);
+          });
+        }
+
+        await saveWorkspaceToDevice();
+        renderApp();
+        showToast('นำเข้าและซิงค์ฐานข้อมูลเรียบร้อยแล้ว');
+      } catch (_) {
+        showToast('ไม่สามารถอ่านไฟล์ .JSON นี้ได้');
+      }
+    }
+
+    async function handleImportFullBackupOnAuth(event) {
+      const file = event.target.files?.[0];
+      event.target.value = '';
+      if (!file) return;
+
+      try {
+        const text = await file.text();
+        const parsed = JSON.parse(text);
+        if (!parsed.userProfile || !parsed.workspace) {
+          showAuthMessage('ไฟล์นี้ไม่ใช่ไฟล์สำรองบัญชีแบบเต็ม (.JSON)');
+          return;
+        }
+        const profile = parsed.userProfile;
+        const ws = parsed.workspace;
+        ws.username = profile.username;
+
+        await LocalDB.put('users', { ...profile, activePayer: profile.displayName });
+        await LocalDB.put('workspaces', ws);
+        await LocalDB.put('meta', { key: 'activeSession', username: profile.username });
+
+        if (parsed.customShareUrl) {
+          appState.customShareUrl = parsed.customShareUrl;
+          await LocalDB.put('meta', { key: 'customShareUrl', url: parsed.customShareUrl });
+        }
+
+        appState.currentUser = { ...profile, activePayer: profile.displayName };
+        appState.workspace = ws;
+        syncDateFiltersToRealTime();
+        renderApp();
+        showToast(`กู้คืนบัญชี ${profile.displayName} สำเร็จ`);
+      } catch (_) {
+        showAuthMessage('ไฟล์สำรองข้อมูลไม่ถูกต้อง');
+      }
+    }
+
+    function confirmClearAccountData() {
+      openConfirmModal(
+        'ล้างข้อมูลรายการทั้งหมด?',
+        'รายรับ-รายจ่าย รายการซื้อของ ปฏิทิน และสัตว์เลี้ยงในบัญชีนี้จะถูกรีเซ็ตเป็นศูนย์ (แนะนำให้ส่งออกไฟล์ .JSON สำรองไว้ก่อน)',
+        'ล้างข้อมูล',
+        async () => {
+          appState.workspace = createCleanWorkspace(appState.currentUser.username);
+          await saveWorkspaceToDevice();
+          renderApp();
+          showToast('รีเซ็ตข้อมูลในบัญชีเป็นศูนย์แล้ว');
+        }
+      );
+    }
+
+    // ===========================================================
+    // 16. MASTER RENDER & BOOTSTRAP
+    // ===========================================================
+    function renderApp() {
+      const authView = document.getElementById('auth-view');
+      const mainView = document.getElementById('main-app-view');
+
+      if (!appState.currentUser || !appState.workspace) {
+        authView.classList.remove('hidden');
+        mainView.classList.add('hidden');
+        return;
+      }
+
+      authView.classList.add('hidden');
+      mainView.classList.remove('hidden');
+
+      renderProfileAndHeader();
+      renderFinance();
+      renderShopping();
+      renderCalendar();
+      renderPets();
+    }
+
+    window.onload = async function () {
+      // 1. Live Real-Time Clock
+      updateRealTimeClock();
+      setInterval(updateRealTimeClock, 1000);
+
+      // 2. Populate Month & Year Dropdowns (2024 - 2032)
+      initMonthYearSelects();
+
+      // 3. Open Local IndexedDB (GreenFinanceDB)
+      await LocalDB.init();
+
+      // 4. Load Saved Custom Share URL if configured
+      const savedShareMeta = await LocalDB.get('meta', 'customShareUrl');
+      if (savedShareMeta && savedShareMeta.url) {
+        appState.customShareUrl = savedShareMeta.url;
+      }
+
+      // 5. Restore Active User Session if Logged In
+      const session = await LocalDB.get('meta', 'activeSession');
+      if (session && session.username) {
+        const savedUser = await LocalDB.get('users', session.username);
+        const savedWS = await LocalDB.get('workspaces', session.username);
+        if (savedUser && savedWS) {
+          appState.currentUser = savedUser;
+          appState.workspace = savedWS;
+          appState.calScopeFilter = savedUser.partnerName ? 'Shared' : 'Personal';
+        }
+      }
+
+      if (!appState.currentUser) {
+        await refreshAuthOnboardingState();
+      }
+
+      syncDateFiltersToRealTime();
+      renderApp();
+    };
+  </script>
+</body>
+</html>
